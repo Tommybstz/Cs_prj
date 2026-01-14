@@ -1,2 +1,2 @@
-# C-_prj
+# C#_prj
 School C# projects
