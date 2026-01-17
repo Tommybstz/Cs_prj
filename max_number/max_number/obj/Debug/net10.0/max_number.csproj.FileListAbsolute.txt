@@ -1,0 +1,14 @@
+C:\Users\tomma\Downloads\C#_Projects\C#_Projects\C#_Projects\C#_Projects\max_number\max_number\bin\Debug\net10.0\max_number.exe
+C:\Users\tomma\Downloads\C#_Projects\C#_Projects\C#_Projects\C#_Projects\max_number\max_number\bin\Debug\net10.0\max_number.deps.json
+C:\Users\tomma\Downloads\C#_Projects\C#_Projects\C#_Projects\C#_Projects\max_number\max_number\bin\Debug\net10.0\max_number.runtimeconfig.json
+C:\Users\tomma\Downloads\C#_Projects\C#_Projects\C#_Projects\C#_Projects\max_number\max_number\bin\Debug\net10.0\max_number.dll
+C:\Users\tomma\Downloads\C#_Projects\C#_Projects\C#_Projects\C#_Projects\max_number\max_number\bin\Debug\net10.0\max_number.pdb
+C:\Users\tomma\Downloads\C#_Projects\C#_Projects\C#_Projects\C#_Projects\max_number\max_number\obj\Debug\net10.0\max_number.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\tomma\Downloads\C#_Projects\C#_Projects\C#_Projects\C#_Projects\max_number\max_number\obj\Debug\net10.0\max_number.AssemblyInfoInputs.cache
+C:\Users\tomma\Downloads\C#_Projects\C#_Projects\C#_Projects\C#_Projects\max_number\max_number\obj\Debug\net10.0\max_number.AssemblyInfo.cs
+C:\Users\tomma\Downloads\C#_Projects\C#_Projects\C#_Projects\C#_Projects\max_number\max_number\obj\Debug\net10.0\max_number.csproj.CoreCompileInputs.cache
+C:\Users\tomma\Downloads\C#_Projects\C#_Projects\C#_Projects\C#_Projects\max_number\max_number\obj\Debug\net10.0\max_number.dll
+C:\Users\tomma\Downloads\C#_Projects\C#_Projects\C#_Projects\C#_Projects\max_number\max_number\obj\Debug\net10.0\refint\max_number.dll
+C:\Users\tomma\Downloads\C#_Projects\C#_Projects\C#_Projects\C#_Projects\max_number\max_number\obj\Debug\net10.0\max_number.pdb
+C:\Users\tomma\Downloads\C#_Projects\C#_Projects\C#_Projects\C#_Projects\max_number\max_number\obj\Debug\net10.0\max_number.genruntimeconfig.cache
+C:\Users\tomma\Downloads\C#_Projects\C#_Projects\C#_Projects\C#_Projects\max_number\max_number\obj\Debug\net10.0\ref\max_number.dll
