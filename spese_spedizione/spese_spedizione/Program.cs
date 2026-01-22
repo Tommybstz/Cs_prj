@@ -1,12 +1,10 @@
-﻿
-class Program
+﻿class Program
 {
     static void Main(string[] args)
     {
         //var
         int N;
-        double weight;
-        double shippingCost=0;
+        double weight,shippingCost=0;
 
         //input
         Console.WriteLine("inserire il numero di pacchi da spedire");
