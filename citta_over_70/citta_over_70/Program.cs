@@ -1,4 +1,4 @@
-﻿class Program
+class Program
 {
     static void Main(string[] args)
     {
@@ -13,9 +13,19 @@
         
         for (int i = 0; i < citta; i++)
         {
+            //input nome
             Console.WriteLine($"Inserisci il nome della citta {i + 1}:");
-            nome =Console.ReadLine();
+            nome =Console.ReadLine() ?? "";
+            while (string.IsNullOrWhiteSpace(nome))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Error.WriteLine("Errore: il nome della citta non puo essere vuoto.");
+                Console.ResetColor();
+                Console.WriteLine($"Inserisci il nome della citta {i + 1}:");
+                nome =Console.ReadLine() ?? "";
+            }
 
+            //input abitanti
             while (true)
             {
                 Console.WriteLine($"Inserisci il numero di abitanti di {nome}:");
@@ -29,6 +39,8 @@
                 }
                 break;
             }
+
+            //input over70
             while (true)
             {
                 Console.WriteLine($"Inserisci il numero di abitanti over 70 di {nome}:");
@@ -42,8 +54,12 @@
                 }
                 break;
             }
-            perc=(double)over70/abitanti*100;
-            Console.WriteLine($"La percentuale di abitanti over 70 di {nome} e pari al {perc}%");
+
+            //calcolo percentuale e output
+            perc = (double)over70/abitanti*100;
+            Console.WriteLine($"La percentuale di abitanti over 70 di {nome} e pari al {perc:F2}%");
         }
+
     }
+
 }
