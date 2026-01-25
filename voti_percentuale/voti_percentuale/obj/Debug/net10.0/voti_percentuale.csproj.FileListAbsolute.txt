@@ -1,0 +1,14 @@
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\voti_percentuale\voti_percentuale\bin\Debug\net10.0\voti_percentuale.exe
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\voti_percentuale\voti_percentuale\bin\Debug\net10.0\voti_percentuale.deps.json
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\voti_percentuale\voti_percentuale\bin\Debug\net10.0\voti_percentuale.runtimeconfig.json
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\voti_percentuale\voti_percentuale\bin\Debug\net10.0\voti_percentuale.dll
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\voti_percentuale\voti_percentuale\bin\Debug\net10.0\voti_percentuale.pdb
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\voti_percentuale\voti_percentuale\obj\Debug\net10.0\voti_percentuale.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\voti_percentuale\voti_percentuale\obj\Debug\net10.0\voti_percentuale.AssemblyInfoInputs.cache
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\voti_percentuale\voti_percentuale\obj\Debug\net10.0\voti_percentuale.AssemblyInfo.cs
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\voti_percentuale\voti_percentuale\obj\Debug\net10.0\voti_percentuale.csproj.CoreCompileInputs.cache
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\voti_percentuale\voti_percentuale\obj\Debug\net10.0\voti_percentuale.dll
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\voti_percentuale\voti_percentuale\obj\Debug\net10.0\refint\voti_percentuale.dll
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\voti_percentuale\voti_percentuale\obj\Debug\net10.0\voti_percentuale.pdb
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\voti_percentuale\voti_percentuale\obj\Debug\net10.0\voti_percentuale.genruntimeconfig.cache
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\voti_percentuale\voti_percentuale\obj\Debug\net10.0\ref\voti_percentuale.dll
