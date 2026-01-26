@@ -1,0 +1,14 @@
+C:\Users\ai2024\Desktop\C#_Projects\controllo_ora\controllo_ora\bin\Debug\net8.0\controllo_ora.exe
+C:\Users\ai2024\Desktop\C#_Projects\controllo_ora\controllo_ora\bin\Debug\net8.0\controllo_ora.deps.json
+C:\Users\ai2024\Desktop\C#_Projects\controllo_ora\controllo_ora\bin\Debug\net8.0\controllo_ora.runtimeconfig.json
+C:\Users\ai2024\Desktop\C#_Projects\controllo_ora\controllo_ora\bin\Debug\net8.0\controllo_ora.dll
+C:\Users\ai2024\Desktop\C#_Projects\controllo_ora\controllo_ora\bin\Debug\net8.0\controllo_ora.pdb
+C:\Users\ai2024\Desktop\C#_Projects\controllo_ora\controllo_ora\obj\Debug\net8.0\controllo_ora.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ai2024\Desktop\C#_Projects\controllo_ora\controllo_ora\obj\Debug\net8.0\controllo_ora.AssemblyInfoInputs.cache
+C:\Users\ai2024\Desktop\C#_Projects\controllo_ora\controllo_ora\obj\Debug\net8.0\controllo_ora.AssemblyInfo.cs
+C:\Users\ai2024\Desktop\C#_Projects\controllo_ora\controllo_ora\obj\Debug\net8.0\controllo_ora.csproj.CoreCompileInputs.cache
+C:\Users\ai2024\Desktop\C#_Projects\controllo_ora\controllo_ora\obj\Debug\net8.0\controllo_ora.dll
+C:\Users\ai2024\Desktop\C#_Projects\controllo_ora\controllo_ora\obj\Debug\net8.0\refint\controllo_ora.dll
+C:\Users\ai2024\Desktop\C#_Projects\controllo_ora\controllo_ora\obj\Debug\net8.0\controllo_ora.pdb
+C:\Users\ai2024\Desktop\C#_Projects\controllo_ora\controllo_ora\obj\Debug\net8.0\controllo_ora.genruntimeconfig.cache
+C:\Users\ai2024\Desktop\C#_Projects\controllo_ora\controllo_ora\obj\Debug\net8.0\ref\controllo_ora.dll

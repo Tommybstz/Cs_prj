@@ -1,0 +1,14 @@
+C:\Users\ai2024\Desktop\C#_Projects\char_check\char_check\bin\Debug\net8.0\char_check.exe
+C:\Users\ai2024\Desktop\C#_Projects\char_check\char_check\bin\Debug\net8.0\char_check.deps.json
+C:\Users\ai2024\Desktop\C#_Projects\char_check\char_check\bin\Debug\net8.0\char_check.runtimeconfig.json
+C:\Users\ai2024\Desktop\C#_Projects\char_check\char_check\bin\Debug\net8.0\char_check.dll
+C:\Users\ai2024\Desktop\C#_Projects\char_check\char_check\bin\Debug\net8.0\char_check.pdb
+C:\Users\ai2024\Desktop\C#_Projects\char_check\char_check\obj\Debug\net8.0\char_check.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ai2024\Desktop\C#_Projects\char_check\char_check\obj\Debug\net8.0\char_check.AssemblyInfoInputs.cache
+C:\Users\ai2024\Desktop\C#_Projects\char_check\char_check\obj\Debug\net8.0\char_check.AssemblyInfo.cs
+C:\Users\ai2024\Desktop\C#_Projects\char_check\char_check\obj\Debug\net8.0\char_check.csproj.CoreCompileInputs.cache
+C:\Users\ai2024\Desktop\C#_Projects\char_check\char_check\obj\Debug\net8.0\char_check.dll
+C:\Users\ai2024\Desktop\C#_Projects\char_check\char_check\obj\Debug\net8.0\refint\char_check.dll
+C:\Users\ai2024\Desktop\C#_Projects\char_check\char_check\obj\Debug\net8.0\char_check.pdb
+C:\Users\ai2024\Desktop\C#_Projects\char_check\char_check\obj\Debug\net8.0\char_check.genruntimeconfig.cache
+C:\Users\ai2024\Desktop\C#_Projects\char_check\char_check\obj\Debug\net8.0\ref\char_check.dll
