@@ -1,0 +1,14 @@
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\fattoriale_num\fattoriale_num\bin\Debug\net10.0\fattoriale_num.exe
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\fattoriale_num\fattoriale_num\bin\Debug\net10.0\fattoriale_num.deps.json
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\fattoriale_num\fattoriale_num\bin\Debug\net10.0\fattoriale_num.runtimeconfig.json
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\fattoriale_num\fattoriale_num\bin\Debug\net10.0\fattoriale_num.dll
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\fattoriale_num\fattoriale_num\bin\Debug\net10.0\fattoriale_num.pdb
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\fattoriale_num\fattoriale_num\obj\Debug\net10.0\fattoriale_num.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\fattoriale_num\fattoriale_num\obj\Debug\net10.0\fattoriale_num.AssemblyInfoInputs.cache
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\fattoriale_num\fattoriale_num\obj\Debug\net10.0\fattoriale_num.AssemblyInfo.cs
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\fattoriale_num\fattoriale_num\obj\Debug\net10.0\fattoriale_num.csproj.CoreCompileInputs.cache
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\fattoriale_num\fattoriale_num\obj\Debug\net10.0\fattoriale_num.dll
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\fattoriale_num\fattoriale_num\obj\Debug\net10.0\refint\fattoriale_num.dll
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\fattoriale_num\fattoriale_num\obj\Debug\net10.0\fattoriale_num.pdb
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\fattoriale_num\fattoriale_num\obj\Debug\net10.0\fattoriale_num.genruntimeconfig.cache
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\fattoriale_num\fattoriale_num\obj\Debug\net10.0\ref\fattoriale_num.dll
