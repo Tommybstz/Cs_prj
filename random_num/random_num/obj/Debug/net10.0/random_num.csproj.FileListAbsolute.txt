@@ -1,0 +1,14 @@
+C:\Users\ai2024\source\repos\random_num\random_num\bin\Debug\net10.0\random_num.exe
+C:\Users\ai2024\source\repos\random_num\random_num\bin\Debug\net10.0\random_num.deps.json
+C:\Users\ai2024\source\repos\random_num\random_num\bin\Debug\net10.0\random_num.runtimeconfig.json
+C:\Users\ai2024\source\repos\random_num\random_num\bin\Debug\net10.0\random_num.dll
+C:\Users\ai2024\source\repos\random_num\random_num\bin\Debug\net10.0\random_num.pdb
+C:\Users\ai2024\source\repos\random_num\random_num\obj\Debug\net10.0\random_num.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ai2024\source\repos\random_num\random_num\obj\Debug\net10.0\random_num.AssemblyInfoInputs.cache
+C:\Users\ai2024\source\repos\random_num\random_num\obj\Debug\net10.0\random_num.AssemblyInfo.cs
+C:\Users\ai2024\source\repos\random_num\random_num\obj\Debug\net10.0\random_num.csproj.CoreCompileInputs.cache
+C:\Users\ai2024\source\repos\random_num\random_num\obj\Debug\net10.0\random_num.dll
+C:\Users\ai2024\source\repos\random_num\random_num\obj\Debug\net10.0\refint\random_num.dll
+C:\Users\ai2024\source\repos\random_num\random_num\obj\Debug\net10.0\random_num.pdb
+C:\Users\ai2024\source\repos\random_num\random_num\obj\Debug\net10.0\random_num.genruntimeconfig.cache
+C:\Users\ai2024\source\repos\random_num\random_num\obj\Debug\net10.0\ref\random_num.dll
