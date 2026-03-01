@@ -1,0 +1,14 @@
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\counter__\counter__\obj\Debug\net10.0\counter__.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\counter__\counter__\obj\Debug\net10.0\counter__.AssemblyInfoInputs.cache
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\counter__\counter__\obj\Debug\net10.0\counter__.AssemblyInfo.cs
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\counter__\counter__\obj\Debug\net10.0\counter__.csproj.CoreCompileInputs.cache
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\counter__\counter__\bin\Debug\net10.0\counter__.exe
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\counter__\counter__\bin\Debug\net10.0\counter__.deps.json
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\counter__\counter__\bin\Debug\net10.0\counter__.runtimeconfig.json
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\counter__\counter__\bin\Debug\net10.0\counter__.dll
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\counter__\counter__\bin\Debug\net10.0\counter__.pdb
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\counter__\counter__\obj\Debug\net10.0\counter__.dll
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\counter__\counter__\obj\Debug\net10.0\refint\counter__.dll
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\counter__\counter__\obj\Debug\net10.0\counter__.pdb
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\counter__\counter__\obj\Debug\net10.0\counter__.genruntimeconfig.cache
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\counter__\counter__\obj\Debug\net10.0\ref\counter__.dll
