@@ -1,0 +1,14 @@
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_multipli\array_multipli\bin\Debug\net10.0\array_multipli.exe
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_multipli\array_multipli\bin\Debug\net10.0\array_multipli.deps.json
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_multipli\array_multipli\bin\Debug\net10.0\array_multipli.runtimeconfig.json
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_multipli\array_multipli\bin\Debug\net10.0\array_multipli.dll
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_multipli\array_multipli\bin\Debug\net10.0\array_multipli.pdb
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_multipli\array_multipli\obj\Debug\net10.0\array_multipli.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_multipli\array_multipli\obj\Debug\net10.0\array_multipli.AssemblyInfoInputs.cache
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_multipli\array_multipli\obj\Debug\net10.0\array_multipli.AssemblyInfo.cs
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_multipli\array_multipli\obj\Debug\net10.0\array_multipli.csproj.CoreCompileInputs.cache
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_multipli\array_multipli\obj\Debug\net10.0\array_multipli.dll
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_multipli\array_multipli\obj\Debug\net10.0\refint\array_multipli.dll
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_multipli\array_multipli\obj\Debug\net10.0\array_multipli.pdb
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_multipli\array_multipli\obj\Debug\net10.0\array_multipli.genruntimeconfig.cache
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_multipli\array_multipli\obj\Debug\net10.0\ref\array_multipli.dll
