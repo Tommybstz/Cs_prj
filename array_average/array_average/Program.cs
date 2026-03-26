@@ -24,5 +24,10 @@
             while (!int.TryParse(Console.ReadLine(), out nums[i])) Console.WriteLine("Errore: valore non valido");
         }
         Console.WriteLine($"La media e {Avg(nums):2F}");
+
+        foreach(int num in nums)
+        {
+            if(num > Avg(nums)) Console.WriteLine($"{num} è maggiore della media");
+        }
     }
 }
