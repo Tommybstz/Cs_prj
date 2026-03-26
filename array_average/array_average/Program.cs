@@ -14,7 +14,7 @@
         int N;
 
         Console.WriteLine("inserire numero elementi:");
-        while (!int.TryParse(Console.ReadLine(), out N)) Console.WriteLine("Errore: valore non valido");
+        while (!int.TryParse(Console.ReadLine(), out N) || N<=0) Console.WriteLine("Errore: valore non valido");
 
         int[] nums = new int[N];
 
