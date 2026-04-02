@@ -1,0 +1,14 @@
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count_uneven_in_even\array_count_uneven_in_even\obj\Debug\net10.0\array_count_uneven_in_even.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count_uneven_in_even\array_count_uneven_in_even\obj\Debug\net10.0\array_count_uneven_in_even.AssemblyInfoInputs.cache
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count_uneven_in_even\array_count_uneven_in_even\obj\Debug\net10.0\array_count_uneven_in_even.AssemblyInfo.cs
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count_uneven_in_even\array_count_uneven_in_even\obj\Debug\net10.0\array_count_uneven_in_even.csproj.CoreCompileInputs.cache
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count_uneven_in_even\array_count_uneven_in_even\bin\Debug\net10.0\array_count_uneven_in_even.exe
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count_uneven_in_even\array_count_uneven_in_even\bin\Debug\net10.0\array_count_uneven_in_even.deps.json
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count_uneven_in_even\array_count_uneven_in_even\bin\Debug\net10.0\array_count_uneven_in_even.runtimeconfig.json
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count_uneven_in_even\array_count_uneven_in_even\bin\Debug\net10.0\array_count_uneven_in_even.dll
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count_uneven_in_even\array_count_uneven_in_even\bin\Debug\net10.0\array_count_uneven_in_even.pdb
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count_uneven_in_even\array_count_uneven_in_even\obj\Debug\net10.0\array_count_uneven_in_even.dll
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count_uneven_in_even\array_count_uneven_in_even\obj\Debug\net10.0\refint\array_count_uneven_in_even.dll
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count_uneven_in_even\array_count_uneven_in_even\obj\Debug\net10.0\array_count_uneven_in_even.pdb
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count_uneven_in_even\array_count_uneven_in_even\obj\Debug\net10.0\array_count_uneven_in_even.genruntimeconfig.cache
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count_uneven_in_even\array_count_uneven_in_even\obj\Debug\net10.0\ref\array_count_uneven_in_even.dll

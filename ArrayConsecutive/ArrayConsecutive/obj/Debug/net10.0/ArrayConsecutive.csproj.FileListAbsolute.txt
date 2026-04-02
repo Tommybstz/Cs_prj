@@ -1,0 +1,14 @@
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\ArrayConsecutive\ArrayConsecutive\bin\Debug\net10.0\ArrayConsecutive.exe
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\ArrayConsecutive\ArrayConsecutive\bin\Debug\net10.0\ArrayConsecutive.deps.json
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\ArrayConsecutive\ArrayConsecutive\bin\Debug\net10.0\ArrayConsecutive.runtimeconfig.json
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\ArrayConsecutive\ArrayConsecutive\bin\Debug\net10.0\ArrayConsecutive.dll
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\ArrayConsecutive\ArrayConsecutive\bin\Debug\net10.0\ArrayConsecutive.pdb
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\ArrayConsecutive\ArrayConsecutive\obj\Debug\net10.0\ArrayConsecutive.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\ArrayConsecutive\ArrayConsecutive\obj\Debug\net10.0\ArrayConsecutive.AssemblyInfoInputs.cache
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\ArrayConsecutive\ArrayConsecutive\obj\Debug\net10.0\ArrayConsecutive.AssemblyInfo.cs
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\ArrayConsecutive\ArrayConsecutive\obj\Debug\net10.0\ArrayConsecutive.csproj.CoreCompileInputs.cache
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\ArrayConsecutive\ArrayConsecutive\obj\Debug\net10.0\ArrayConsecutive.dll
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\ArrayConsecutive\ArrayConsecutive\obj\Debug\net10.0\refint\ArrayConsecutive.dll
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\ArrayConsecutive\ArrayConsecutive\obj\Debug\net10.0\ArrayConsecutive.pdb
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\ArrayConsecutive\ArrayConsecutive\obj\Debug\net10.0\ArrayConsecutive.genruntimeconfig.cache
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\ArrayConsecutive\ArrayConsecutive\obj\Debug\net10.0\ref\ArrayConsecutive.dll
