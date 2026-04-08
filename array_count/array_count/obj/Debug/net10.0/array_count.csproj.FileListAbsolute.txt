@@ -1,0 +1,14 @@
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count\array_count\obj\Debug\net10.0\array_count.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count\array_count\obj\Debug\net10.0\array_count.AssemblyInfoInputs.cache
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count\array_count\obj\Debug\net10.0\array_count.AssemblyInfo.cs
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count\array_count\obj\Debug\net10.0\array_count.csproj.CoreCompileInputs.cache
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count\array_count\bin\Debug\net10.0\array_count.exe
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count\array_count\bin\Debug\net10.0\array_count.deps.json
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count\array_count\bin\Debug\net10.0\array_count.runtimeconfig.json
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count\array_count\bin\Debug\net10.0\array_count.dll
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count\array_count\bin\Debug\net10.0\array_count.pdb
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count\array_count\obj\Debug\net10.0\array_count.dll
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count\array_count\obj\Debug\net10.0\refint\array_count.dll
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count\array_count\obj\Debug\net10.0\array_count.pdb
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count\array_count\obj\Debug\net10.0\array_count.genruntimeconfig.cache
+C:\Users\tomma\OneDrive\Desktop\C#_Projects\C#_Projects\C#_Projects\C#_Projects\array_count\array_count\obj\Debug\net10.0\ref\array_count.dll
