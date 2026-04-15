@@ -1,4 +1,6 @@
 ﻿
+using System.Diagnostics.Contracts;
+
 namespace FinanceTracker
 {
     public class Ui
@@ -36,6 +38,23 @@ namespace FinanceTracker
             Console.ForegroundColor = color;
             Console.WriteLine($"{label.PadRight(12)} {message}");
             Console.ResetColor();
+        }
+
+        public static void PrintTransactions(IEnumerable<Transaction> transactions)
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("\n================ TRANSACTIONS ================");
+            Console.ResetColor();
+
+            Console.WriteLine($"{"TYPE",-10} {"CATEGORY",-15} {"AMOUNT",-10} {"DATE",-12} {"NOTE"}");
+            Console.WriteLine(new string('-', 50));
+
+            foreach (var t in transactions)
+            {
+                Console.WriteLine($"{t.Type,-10} {t.Category,-15} {t.Amount,10:C} {t.Date:yyyy-MM-dd,-12} {t.Note}");
+            }
+
+            Console.WriteLine(new string('-', 50));
         }
     }
 }

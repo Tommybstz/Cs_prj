@@ -3,6 +3,7 @@ namespace FinanceTracker
 {
     public class Transaction
     {
+        public int Id { get; set; } // Unique identifier for the transaction
         public string Type { get; set; }//expense or income
         public string Category { get; set; }//food, transport, salary, etc.
         public decimal Amount { get; set; }//positive for income, negative for expenses
