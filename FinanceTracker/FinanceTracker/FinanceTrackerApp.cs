@@ -79,7 +79,7 @@ namespace FinanceTracker
                 //wait for user to press a key before showing the menu again(except for exit option which will skip this) so you have time to read any message or transaction.
                 if (running)
                 {
-                    Console.WriteLine("\n--- Press any key to continue ---");
+                    Ui.Message(ConsoleColor.DarkGray, "", "\nPress any key to continue...");
                     Console.ReadKey();
                 }
 
@@ -197,7 +197,7 @@ namespace FinanceTracker
 
             //confirm cancellation with user, showing details of most recent transaction
             Ui.Message(ConsoleColor.Yellow, "[WARN]", "This will remove the most recent transaction.");
-            Console.WriteLine($"\n{transactions.Last()}\n");
+            Ui.PrintTransactions(new[] { transactions.Last() });// Converts single transaction into IEnumerable for PrintTransactions compatibility
             Ui.Message(ConsoleColor.Yellow, "", "Are you sure? [y/n]");
 
             char confirm;

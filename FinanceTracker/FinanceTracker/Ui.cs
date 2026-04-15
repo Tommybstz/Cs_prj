@@ -42,19 +42,43 @@ namespace FinanceTracker
 
         public static void PrintTransactions(IEnumerable<Transaction> transactions)
         {
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("\n================ TRANSACTIONS ================");
-            Console.ResetColor();
+            var list = transactions.ToList();
 
-            Console.WriteLine($"{"TYPE",-10} {"CATEGORY",-15} {"AMOUNT",-10} {"DATE",-12} {"NOTE"}");
-            Console.WriteLine(new string('-', 50));
-
-            foreach (var t in transactions)
+            if (!list.Any())
             {
-                Console.WriteLine($"{t.Type,-10} {t.Category,-15} {t.Amount,10:C} {t.Date:yyyy-MM-dd,-12} {t.Note}");
+                Console.WriteLine("No transactions found.");
+                return;
             }
 
-            Console.WriteLine(new string('-', 50));
+            // calculate dynamic column widths
+            int idWidth = Math.Max(2, list.Max(t => t.Id.ToString().Length));
+            int typeWidth = Math.Max(4, list.Max(t => t.Type.Length));
+            int catWidth = Math.Max(8, list.Max(t => t.Category.Length));
+            int amountWidth = Math.Max(6, list.Max(t => t.Amount.ToString("0.00").Length));
+            int dateWidth = 10;
+
+            // header
+            Console.WriteLine(
+                $"{"ID".PadRight(idWidth)} | " +
+                $"{"Type".PadRight(typeWidth)} | " +
+                $"{"Category".PadRight(catWidth)} | " +
+                $"{"Amount".PadRight(amountWidth)} | " +
+                $"{"Date".PadRight(dateWidth)} | Note"
+            );
+
+            Console.WriteLine(new string('-', idWidth + typeWidth + catWidth + amountWidth + dateWidth + 15));
+
+            // rows
+            foreach (var t in list)
+            {
+                Console.WriteLine(
+                    $"{t.Id.ToString().PadRight(idWidth)} | " +
+                    $"{t.Type.PadRight(typeWidth)} | " +
+                    $"{t.Category.PadRight(catWidth)} | " +
+                    $"{t.Amount.ToString("C").PadRight(amountWidth)} | " +
+                    $"{t.Date.ToString("yyyy-MM-dd").PadRight(dateWidth)} | {t.Note}"
+                );
+            }
         }
     }
 }
