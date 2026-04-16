@@ -332,14 +332,14 @@ namespace FinanceTracker
         public void SaveData()
         {
             //save the transactions list to a file named FinanceTrackerData.json in the same directory as the application. if the file already exists, it will be overwritten
-            File.WriteAllText(dataFile, JsonSerializer.Serialize(transactions));
+            File.WriteAllText("FinanceTrackerData.json", JsonSerializer.Serialize(transactions));
         }
         public void LoadData()
         {
             //load data from file if it exists, otherwise initialize empty list
             try
             {
-                string json = File.ReadAllText(dataFile);//read the contents of the file into a string variable. if the file doesn't exist, this will throw a FileNotFoundException which we catch below
+                string json = File.ReadAllText("FinanceTrackerData.json");//read the contents of the file into a string variable. if the file doesn't exist, this will throw a FileNotFoundException which we catch below
                 transactions = JsonSerializer.Deserialize<List<Transaction>>(json) ?? new List<Transaction>();//if deserialization returns null, initialize empty list. the ?? checks if null and if it is, it creates a new List<Transaction>()
                 
                 NextId= transactions.Any()? transactions.Max(t=>t.Id) + 1 : 1;//set the NextId to be one greater than the maximum existing ID in the loaded transactions, or 1 if there are no transactions. this ensures that new transactions will have unique IDs even after loading from a file.
