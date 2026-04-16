@@ -206,7 +206,7 @@ namespace FinanceTracker
 
             if (confirm == 'y')
             {
-                transactions.RemoveAt(transactions.Count-1);
+                transactions.RemoveAt(transactions.Count - 1);
                 NextId = transactions.Count > 0 ? transactions.Max(t => t.Id) + 1 : 1; // update NextId after removal
                 SaveData();
                 Ui.Message(ConsoleColor.Green, "[SUCCESS]", "Most recent transaction removed.");
