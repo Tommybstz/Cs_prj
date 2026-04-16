@@ -9,11 +9,14 @@ using System.Runtime.CompilerServices;
     📊 category breakdown
     💾 backup system
     ✏️ edit transaction
+    
 
      create a folder for the data to keep cleaner
      and use the path combine when saving and loading to ensure it works on all operating systems. for now it just saves in the same directory as the application which is simpler but can get cluttered.
      add the datafile in the addtransaction and cancel transaction
      move the storage logic in a separate class
+    and add way to cancel action (ex. you want to leave the transaction adder without adding a transaction or haveing to cancel it after)
+    and to cancel a step (ex. im typing at the amount input but i typed the wrong type and i press a key to return to the type)
  */
 namespace FinanceTracker
 {
@@ -70,7 +73,8 @@ namespace FinanceTracker
                 if (!menu.TryGetValue(input, out var selection))
                 {
                     Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid option. Please enter 1-7.");
-                    continue;
+                    Pause();
+                    continue;  
                 }
 
                 //call the method associated with the selected option
@@ -79,8 +83,7 @@ namespace FinanceTracker
                 //wait for user to press a key before showing the menu again(except for exit option which will skip this) so you have time to read any message or transaction.
                 if (running)
                 {
-                    Ui.Message(ConsoleColor.DarkGray, "", "\nPress any key to continue...");
-                    Console.ReadKey();
+                    Pause();
                 }
 
             }
@@ -362,6 +365,11 @@ namespace FinanceTracker
                 transactions = new List<Transaction>();
             }
 
+        }
+        public void Pause()
+        {
+            Ui.Message(ConsoleColor.DarkGray, "", "\nPress any key to continue...");
+            Console.ReadKey();
         }
     }
 }
