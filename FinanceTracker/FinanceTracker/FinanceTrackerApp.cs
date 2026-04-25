@@ -1,20 +1,22 @@
 ﻿
-using System.Threading;
+using System.Data.Common;
 using System.Diagnostics;
-using System.Text.Json;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
+using System.Threading;
+using System.Transactions;
 /*
  TODO:
-    🔎 Search system
-    📊 category breakdown
+    🔎 Search system ...coming soon
+    📊 category breakdown ...coming later
     💾 backup system  x
-    ✏️ edit transaction
+    ✏️ edit transaction ...work in progress
     
 
    x  create a folder for the data to keep cleaner
    x  and use the path combine when saving and loading to ensure it works on all operating systems. for now it just saves in the same directory as the application which is simpler but can get cluttered.
-     add the datafile in the addtransaction and cancel transaction
-     move the storage logic in a separate class
+   ?  add the datafile in the addtransaction and cancel transaction
+   x  move the storage logic in a separate class
   x  and add way to cancel action (ex. you want to leave the transaction adder without adding a transaction or having to cancel it after)
   x  and to cancel a step (ex. im typing at the amount input but i typed the wrong type and i press a key to return to the type)
 
@@ -34,7 +36,7 @@ namespace FinanceTracker
         public FinanceTrackerApp()
         {
             transactions = new();
-            storage = new FileStorage(transactions);// create an instance for the FileStorage
+            storage = new FileStorage();// create an instance for the FileStorage
         }
 
 
@@ -52,7 +54,7 @@ namespace FinanceTracker
                 {"3", ("View all transactions", ViewAll)},
                 {"4", ("Filtered View", FilteredView)},
                 {"5", ("View summary", ViewSummary)},
-                {"6", ("Export & open CSV", storage.ExportCsv)},
+                {"6", ("Export & open CSV", () => storage.ExportCsv(transactions))},
                 {"7", ("Exit", () =>{ running = false; }) }
             };
 
@@ -142,7 +144,7 @@ namespace FinanceTracker
             Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
 
             decimal amount;
-
+            
             string amountInput = Console.ReadLine();
 
             if (amountInput?.Trim().ToLower() == "cancel") return;
@@ -212,7 +214,7 @@ namespace FinanceTracker
             transactions.Add(transaction);
 
             //save to file (JSON)
-            storage.SaveData();
+            storage.SaveData(transactions);
             Ui.Message(ConsoleColor.Green, "[SUCCESS]", "Transaction saved!.");
 
         }
@@ -239,7 +241,7 @@ namespace FinanceTracker
                 transactions.RemoveAt(transactions.Count - 1);
                 nextId = transactions.Count > 0 ? transactions.Max(t => t.Id) + 1 : 1; // update NextId after removal
 
-                storage.SaveData();
+                storage.SaveData(transactions);
 
                 Ui.Message(ConsoleColor.Green, "[SUCCESS]", "Most recent transaction removed.");
             }
@@ -247,6 +249,146 @@ namespace FinanceTracker
             {
                 Ui.Message(ConsoleColor.Cyan, "[INFO]", "Transaction not removed.");
             }
+        }
+        public void EditTransaction()
+        {
+            int id;
+            string idInput;
+
+            if (transactions.Count == 0)
+            {
+                Ui.Message(ConsoleColor.Cyan, "[INFO]", "No transactions to edit.");
+                return;
+            }
+
+            Console.Write("Enter Id to edit: ");
+            idInput = Console.ReadLine().Trim().ToLower();
+
+            if (idInput == "cancel") return;
+
+            while (!int.TryParse(idInput, out id)|| !transactions.Any(t=>t.Id==id)) {
+
+                Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid ID. Please enter a valid transaction ID:");
+                idInput = Console.ReadLine().Trim().ToLower();
+                if (idInput == "cancel") return;
+            }
+
+            Transaction t=transactions.First(t=>t.Id==id);//reference to the transaction 
+
+            Console.Write("Enter field to edit (type, category, amount, date, note): ");
+            string field = Console.ReadLine().Trim().ToLower();
+
+            switch (field)
+            {
+                case "type":
+                    //edit type
+                    Console.WriteLine("Enter transaction type (expense/-) or (income/+):");
+                    Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
+
+                    string type = Console.ReadLine().ToLower().Trim();
+
+                    if (type == "cancel") return;
+
+                    while (type != "expense" && type != "-" && type != "income" && type != "+")
+                    {
+                        Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter 'expense/-' or 'income/+':");
+
+                        type = Console.ReadLine().ToLower().Trim();
+
+                        if (type == "cancel") return;
+                    }
+
+                    t.Type = (type == "-") ? "expense" : (type == "+") ? "income":type;
+
+                    t.Amount= (t.Type =="expense")? -Math.Abs(t.Amount):Math.Abs(t.Amount);//update the value 
+
+                    break;
+
+                case "category":
+                    //edit category
+                    Console.Write("Enter transaction category: ");
+                    Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
+
+                    string category = Console.ReadLine().ToLower();
+
+                    if (string.IsNullOrEmpty(category))
+                    {
+                        category = "generic";
+                    }
+
+                    t.Category = category;
+
+                    break;
+
+                case "Amount":
+                    //edit amount
+                    decimal amount;
+
+                    Console.Write("Enter transaction amount: ");
+                    Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
+
+                    string amountInput = Console.ReadLine();
+
+                    if (amountInput?.Trim().ToLower() == "cancel") return;
+
+                    while (!decimal.TryParse(amountInput, out amount) || amount <= 0)
+                    {
+                        Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter a positive number: ");
+
+                        amountInput = Console.ReadLine();
+
+                        if (amountInput?.Trim().ToLower() == "cancel") return;
+                    }
+
+                    t.Amount = (t.Type == "expense") ? -amount : amount;
+
+                    break;
+                   
+
+
+                case "date":
+                    //edit date
+                    Console.Write("Enter transaction date (yyyy-mm-dd) or press Enter to use today's date: ");
+                    Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
+
+                    string dateInput = Console.ReadLine().Trim();
+                    if (dateInput.ToLower() == "cancel") return;
+
+                    DateTime date;
+
+                    while (!DateTime.TryParse(dateInput, out date))
+                    {
+                        Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter a valid date (yyyy-mm-dd):");
+                        dateInput = Console.ReadLine().Trim();
+                        if (dateInput.ToLower() == "cancel") return;//it returns early so the value stays the same
+                    }
+
+                    t.Date = date;
+
+                    break;
+
+
+                case "note":
+                    //edit note
+                    Console.WriteLine("Enter a note (optional): ");
+                    Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
+
+                    string note = Console.ReadLine();
+
+                    if (!string.IsNullOrEmpty(note))
+                    {
+                        if (note.Trim().ToLower() == "cancel") return;//returns early so it stays the same
+                        t.Note = note ?? "";
+                    }
+                    break;
+
+                default:
+                    Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid field.");
+                    return;
+            }
+            storage.SaveData(transactions);
+            Ui.Message(ConsoleColor.Green, "[SUCCESS]", "Transaction saved!.");
+
         }
         public void ViewAll()
         {

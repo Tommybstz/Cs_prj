@@ -8,19 +8,17 @@ namespace FinanceTracker
 
     internal class FileStorage
     {
-        private List<Transaction> transactions;
         private readonly string dataFolder = "UserData";
         private readonly string dataFile;
         private readonly string backupFile;
 
-        public FileStorage(List<Transaction> transactions)
+        public FileStorage()
         {
-            this.transactions = transactions;
             dataFile = Path.Combine(dataFolder, "FinanceTrackerData.json");//set the data file path to be inside the UserData folder. this keeps the application directory cleaner and allows for better organization of user data.
             backupFile = Path.Combine(dataFolder, $"FTD_backup_{DateTime.Today:yyyy-MM-dd}.json");
             Directory.CreateDirectory(dataFolder);//ensure the data folder exists. if it already exists, this does nothing
         }
-        public void ExportCsv()
+        public void ExportCsv(List<Transaction> transactions)
         {
             //exit early if no transactions to export
             if (transactions.Count == 0)
@@ -48,40 +46,37 @@ namespace FinanceTracker
             Process.Start(new ProcessStartInfo { FileName = "FinanceTrackerData.csv", UseShellExecute = true });
 
         }
-        public void SaveData()
+        public void SaveData(List<Transaction> transactions)
         {
             //save the transactions list to a file named FinanceTrackerData.json in the same directory as the application. if the file already exists, it will be overwritten
             File.WriteAllText(dataFile, JsonSerializer.Serialize(transactions));
             BackupData();
         }
-        public void LoadData()
+        public List<Transaction> LoadData()
         {
             //load data from file if it exists, otherwise initialize empty list
             try
             {
                 string json = File.ReadAllText(dataFile);//read the contents of the file into a string variable. if the file doesn't exist, this will throw a FileNotFoundException which we catch below
-                var loaded = JsonSerializer.Deserialize<List<Transaction>>(json) ?? new List<Transaction>();//if deserialization returns null, initialize empty list. the ?? checks if null and if it is, it creates a new List<Transaction>()
-                transactions.Clear();
-                transactions.AddRange(loaded);
-
-                //NextId = transactions.Any() ? transactions.Max(t => t.Id) + 1 : 1;//set the NextId to be one greater than the maximum existing ID in the loaded transactions, or 1 if there are no transactions. this ensures that new transactions will have unique IDs even after loading from a file.
+                return JsonSerializer.Deserialize<List<Transaction>>(json) ?? new List<Transaction>();//if deserialization returns null, initialize empty list. the ?? checks if null and if it is, it creates a new List<Transaction>()
+                
             }
             catch (FileNotFoundException)
             {
                 Ui.Message(ConsoleColor.Cyan, "[INFO]", "No save file found. Starting a new one.");//if the file doesn't exist, we just start with an empty list of transactions. this is not an error condition, so we show an info message and continue
-                transactions.Clear();
+                return new List<Transaction>();
             }
             catch (JsonException)
             {
                 Ui.Message(ConsoleColor.Red, "[ERROR]", "Save file is corrupted and cannot be read. Starting fresh.");//if the file is corrupted and can't be deserialized, we show an error message and start with an empty list.
-                transactions.Clear();
+                return new List<Transaction>();
 
                 //might add functionality in the future to backup the corrupted file with a timestamp so the user doesn't lose all their data, but for now we just start fresh if the file can't be read
             }
             catch (Exception)
             {
                 Ui.Message(ConsoleColor.Red, "[ERROR]", "Unexpected error loading data. Starting fresh.");
-                transactions.Clear();
+                return new List<Transaction>();
             }
 
         }
