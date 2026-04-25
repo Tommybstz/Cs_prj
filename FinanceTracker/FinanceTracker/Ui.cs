@@ -3,7 +3,7 @@ using System.Diagnostics.Contracts;
 
 namespace FinanceTracker
 {
-    public class Ui
+    public static class Ui
     {
         public static void BarChart(List<Transaction> transactions)
         {

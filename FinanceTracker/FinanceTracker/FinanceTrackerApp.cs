@@ -16,7 +16,6 @@
 
    x  add a transaction manager (a class that owns the data) so it's safer for the data
  */
-using System.Transactions;
 
 namespace FinanceTracker
 {
