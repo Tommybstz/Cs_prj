@@ -1,7 +1,7 @@
 ﻿
 /*
  TODO:
-    🔎 Search system ...coming soon
+    🔎 Search system ...kindof (filtered view)
     📊 category breakdown ...coming later
     💾 backup system  x
     ✏️ edit transaction x
@@ -14,7 +14,7 @@
   x  and add way to cancel action (ex. you want to leave the transaction adder without adding a transaction or having to cancel it after)
   x  and to cancel a step (ex. im typing at the amount input but i typed the wrong type and i press a key to return to the type)
 
-     add a transaction manager (a class that owns the data) so it's safer for the data
+   x  add a transaction manager (a class that owns the data) so it's safer for the data
  */
 using System.Transactions;
 
@@ -81,125 +81,38 @@ namespace FinanceTracker
 
         public void AddTransaction()
         {
-            //new transaction object to hold user input
-            Transaction transaction = new Transaction();
+            // get transaction type
+            string? type = PromptType();
+            if (type == null) return; // user cancelled
 
-            //type input with validation
-            Console.WriteLine("Enter transaction type (expense/-) or (income/+):");
-            Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
+            // get category, defaults to "generic" if left blank
+            string category = PromptCategory();
 
-            string type = Console.ReadLine()?.ToLower().Trim()??"";
+            // get amount, must be a positive number
+            decimal? amount = PromptAmount();
+            if (amount == null) return; 
 
-            if (type == "cancel") return;
+            // get date, defaults to today if left blank
+            DateTime? date = PromptDate();
+            if (date == null) return; 
 
-            while (type != "expense" && type != "-" && type != "income" && type != "+")
+            // get optional note
+            string note = PromptNote();
+
+            // build transaction object
+            Transaction transaction = new Transaction
             {
-                Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter 'expense/-' or 'income/+':");
+                Type = type,
+                Category = category,
+                Amount = type == "expense" ? -amount.Value : amount.Value,
+                Date = date.Value,
+                Note = note
+            };
 
-                type = Console.ReadLine()?.ToLower().Trim()??"";
-
-                if (type == "cancel") return;
-            }
-
-            if (type == "-")
-            {
-                type = "expense";
-            }
-            else if (type == "+")
-            {
-                type = "income";
-            }
-
-            transaction.Type = type;
-
-            //category input with default to "generic" if left blank
-            Console.Write("Enter transaction category: ");
-            Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
-
-            string category = Console.ReadLine()?.ToLower()??"";
-
-            if (string.IsNullOrEmpty(category))
-            {
-                category = "generic";
-            }
-
-            transaction.Category = category;
-
-            //amount input with validation to ensure it's a positive decimal number
-            Console.Write("Enter transaction amount: ");
-            Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
-
-            decimal amount;
-            
-            string amountInput = Console.ReadLine()??"";
-
-            if (amountInput?.Trim().ToLower() == "cancel") return;
-
-            while (!decimal.TryParse(amountInput, out amount) || amount <= 0)
-            {
-                Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter a positive number: ");
-
-                amountInput = Console.ReadLine()??"";
-
-                if (amountInput?.Trim().ToLower() == "cancel") return;
-            }
-
-            if (transaction.Type == "expense")
-            {
-                transaction.Amount = -amount; // expenses are negative
-            }
-            else
-            {
-                transaction.Amount = amount; // income is positive
-            }
-
-            //date input with validation, default to today's date if left blank
-            Console.Write("Enter transaction date (yyyy-mm-dd) or press Enter to use today's date: ");
-            Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
-
-            DateTime date = DateTime.Now;
-
-            string dateInput = Console.ReadLine()??"";
-            if (!string.IsNullOrEmpty(dateInput))
-            {
-                if (dateInput.Trim().ToLower() == "cancel") return;
-
-                while (!DateTime.TryParse(dateInput, out date))
-                {
-                    Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter a valid date (yyyy-mm-dd) or press Enter to use today's date: ");
-                    dateInput = Console.ReadLine()??"";
-
-                    if (string.IsNullOrEmpty(dateInput))
-                    {
-                        date = DateTime.Now;
-                        break;
-                    }
-
-                    if (dateInput.Trim().ToLower() == "cancel") return;
-
-                }
-            }
-            transaction.Date = date;
-
-            //note input (optional)
-            Console.WriteLine("Enter a note (optional): ");
-            Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
-
-            string note = Console.ReadLine()??"";
-
-            if (!string.IsNullOrEmpty(note))
-            {
-                if (note.Trim().ToLower() == "cancel") return;
-                transaction.Note = note ?? "";
-            }
-
-            //add to list
+            // add to manager and save to file
             manager.Add(transaction);
-
-            //save to file (JSON)
             storage.SaveData(manager.Transactions.ToList());
-            Ui.Message(ConsoleColor.Green, "[SUCCESS]", "Transaction saved!.");
-
+            Ui.Message(ConsoleColor.Green, "[SUCCESS]", "Transaction saved!");
         }
         public void UndoLastTransaction()
         {
@@ -232,151 +145,102 @@ namespace FinanceTracker
                 Ui.Message(ConsoleColor.Cyan, "[INFO]", "Transaction not removed.");
             }
         }
+        public void RemoveById()
+        {
+            if (manager.Transactions.Count == 0) {
+                Ui.Message(ConsoleColor.Cyan, "[INFO]", "No transactions to remove.");
+                return;
+            }
+
+            int? id = PromptId();
+
+            if (id == null) return;
+
+            Transaction? t=manager.GetById(id.Value);//use .value because it's an int?
+
+            Ui.Message(ConsoleColor.Yellow, "[WARN]", "This will remove the following transaction:");
+            Ui.PrintTransactions(new[] { t! });
+            Ui.Message(ConsoleColor.Yellow, "", "Are you sure? [y/n]");
+
+            char confirm;
+            while (!char.TryParse(Console.ReadLine()?.ToLower().Trim(), out confirm) || (confirm != 'y' && confirm != 'n'))
+                Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter 'y' or 'n':");
+
+            if (confirm == 'n') return;
+
+            manager.Remove(id.Value);//removes the transaction
+
+            //save data
+            storage.SaveData(manager.Transactions.ToList());
+            Ui.Message(ConsoleColor.Green, "[SUCCESS]", "Transaction removed!");
+        }
         public void EditTransaction()
         {
-            int id;
-            string idInput;
-
+            // exit early if no transactions to edit
             if (manager.Transactions.Count == 0)
             {
                 Ui.Message(ConsoleColor.Cyan, "[INFO]", "No transactions to edit.");
                 return;
             }
 
-            Console.Write("Enter Id to edit: ");
-            idInput = Console.ReadLine()?.Trim().ToLower()??"";
+            // get transaction ID to edit
+            int? id= PromptId();
+            if(id == null) return;
 
-            if (idInput == "cancel") return;
-
-            while (!int.TryParse(idInput, out id)|| manager.GetById(id)==null){
-
-                Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid ID. Please enter a valid transaction ID:");
-                idInput = Console.ReadLine()?.Trim().ToLower()??"";
-                if (idInput == "cancel") return;
-            }
-
-            Transaction? t=manager.GetById(id);//reference to the transaction 
-
+            // get reference to the transaction
+            Transaction? t = manager.GetById(id.Value);
             if (t == null)
             {
                 Ui.Message(ConsoleColor.Red, "[ERROR]", "Transaction not found.");
                 return;
             }
 
+            // get field to edit
             Console.Write("Enter field to edit (type, category, amount, date, note): ");
-            string field = Console.ReadLine()?.Trim().ToLower()??"";
+            string field = Console.ReadLine()?.Trim().ToLower() ?? "";
 
             switch (field)
             {
                 case "type":
-                    //edit type
-                    Console.WriteLine("Enter transaction type (expense/-) or (income/+):");
-                    Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
-
-                    string type = Console.ReadLine()?.ToLower().Trim()??"";
-
-                    if (type == "cancel") return;
-
-                    while (type != "expense" && type != "-" && type != "income" && type != "+")
-                    {
-                        Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter 'expense/-' or 'income/+':");
-
-                        type = Console.ReadLine()?.ToLower().Trim()??"";
-
-                        if (type == "cancel") return;
-                    }
-
-                    t.Type = (type == "-") ? "expense" : (type == "+") ? "income":type;
-
-                    t.Amount= (t.Type =="expense")? -Math.Abs(t.Amount):Math.Abs(t.Amount);//update the value 
-
+                    // edit type and update amount sign accordingly
+                    string? type = PromptType();
+                    if (type == null) break; // keep old value
+                    t.Type = type;
+                    t.Amount = t.Type == "expense" ? -Math.Abs(t.Amount) : Math.Abs(t.Amount);
                     break;
 
                 case "category":
-                    //edit category
-                    Console.Write("Enter transaction category: ");
-                    Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
-
-                    string category = Console.ReadLine()?.ToLower()??"";
-
-                    if (string.IsNullOrEmpty(category))
-                    {
-                        category = "generic";
-                    }
-
-                    t.Category = category;
-
+                    // edit category, defaults to "generic" if left blank
+                    t.Category = PromptCategory();
                     break;
 
                 case "amount":
-                    //edit amount
-                    decimal amount;
-
-                    Console.Write("Enter transaction amount: ");
-                    Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
-
-                    string amountInput = Console.ReadLine()??"";
-
-                    if (amountInput?.Trim().ToLower() == "cancel") return;
-
-                    while (!decimal.TryParse(amountInput, out amount) || amount <= 0)
-                    {
-                        Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter a positive number: ");
-
-                        amountInput = Console.ReadLine()??"";
-
-                        if (amountInput?.Trim().ToLower() == "cancel") return;
-                    }
-
-                    t.Amount = (t.Type == "expense") ? -amount : amount;
-
+                    // edit amount, keep sign based on type
+                    decimal? amount = PromptAmount();
+                    if (amount == null) break; // keep old value
+                    t.Amount = t.Type == "expense" ? -amount.Value : amount.Value;
                     break;
-                   
-
 
                 case "date":
-                    //edit date
-                    Console.Write("Enter transaction date (yyyy-mm-dd) or press Enter to use today's date: ");
-                    Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
-
-                    string dateInput = Console.ReadLine()?.Trim()??"";
-                    if (dateInput.ToLower() == "cancel") return;
-
-                    DateTime date;
-
-                    while (!DateTime.TryParse(dateInput, out date))
-                    {
-                        Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter a valid date (yyyy-mm-dd):");
-                        dateInput = Console.ReadLine()?.Trim()??"";
-                        if (dateInput.ToLower() == "cancel") return;//it returns early so the value stays the same
-                    }
-
-                    t.Date = date;
-
+                    // edit date, keep old value if cancelled
+                    DateTime? date = PromptDate();
+                    if (date == null) break; // keep old value
+                    t.Date = date.Value;
                     break;
 
-
                 case "note":
-                    //edit note
-                    Console.WriteLine("Enter a note (optional): ");
-                    Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
-
-                    string note = Console.ReadLine()??"";
-
-                    if (!string.IsNullOrEmpty(note))
-                    {
-                        if (note.Trim().ToLower() == "cancel") return;//returns early so it stays the same
-                        t.Note = note ?? "";
-                    }
+                    // edit optional note
+                    t.Note = PromptNote();
                     break;
 
                 default:
                     Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid field.");
                     return;
             }
-            storage.SaveData(manager.Transactions.ToList());
-            Ui.Message(ConsoleColor.Green, "[SUCCESS]", "Transaction saved!.");
 
+            // save changes to file
+            storage.SaveData(manager.Transactions.ToList());
+            Ui.Message(ConsoleColor.Green, "[SUCCESS]", "Transaction saved!");
         }
         public void ViewAll()
         {
@@ -467,6 +331,99 @@ namespace FinanceTracker
         {
             Ui.Message(ConsoleColor.DarkGray, "", "\nPress any key to continue...");
             Console.ReadKey();
+        }
+
+        //helpers
+        private int? PromptId()
+        {
+            Ui.PrintTransactions(manager.Transactions);
+            Console.Write("Enter transaction ID: ");
+            string input = Console.ReadLine()?.Trim().ToLower() ?? "";
+            if (input == "cancel") return null;
+
+            int id;
+            while (!int.TryParse(input, out id) || manager.GetById(id) == null)
+            {
+                Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid ID. Please enter a valid transaction ID:");
+                input = Console.ReadLine()?.Trim().ToLower() ?? "";
+                if (input == "cancel") return null;
+            }
+
+            return id;
+        }
+        private string? PromptType()
+        {
+            Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
+            Console.Write("Enter transaction type (expense/-) or (income/+):");
+
+            string input = Console.ReadLine()?.ToLower().Trim() ?? "";
+            if (input == "cancel") return null;
+
+            while (input != "expense" && input != "-" && input != "income" && input != "+")
+            {
+                Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter 'expense/-' or 'income/+':");
+                input = Console.ReadLine()?.ToLower().Trim() ?? "";
+                if (input == "cancel") return null;
+            }
+
+            return input == "-" ? "expense" : input == "+" ? "income" : input;
+        }
+        private string PromptCategory()
+        {
+            Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
+            Console.Write("Enter transaction category: ");
+
+            string input = Console.ReadLine()?.ToLower() ?? "";
+            return string.IsNullOrEmpty(input) ? "generic" : input;
+        }
+        private decimal? PromptAmount()
+        {
+            Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
+            Console.Write("Enter transaction amount: ");
+
+            string input = Console.ReadLine()?.Trim() ?? "";
+            if (input.ToLower() == "cancel") return null;
+
+            decimal amount;
+            while (!decimal.TryParse(input, out amount) || amount <= 0)
+            {
+                Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter a positive number:");
+                input = Console.ReadLine()?.Trim() ?? "";
+                if (input.ToLower() == "cancel") return null;
+            }
+
+            return amount;
+        }
+        private DateTime? PromptDate()
+        {
+            Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
+            Console.Write("Enter transaction date (yyyy-mm-dd) or press Enter to use today's date: ");
+
+            string input = Console.ReadLine()?.Trim() ?? "";
+            if (input.ToLower() == "cancel") return null;
+
+            if (string.IsNullOrEmpty(input)) return DateTime.Now;
+
+            DateTime date;
+            while (!DateTime.TryParse(input, out date))
+            {
+                Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter a valid date (yyyy-mm-dd) or press Enter for today:");
+                input = Console.ReadLine()?.Trim() ?? "";
+                if (input.ToLower() == "cancel") return null;
+                if (string.IsNullOrEmpty(input)) return DateTime.Now;
+            }
+
+            return date;
+        }
+        private string PromptNote()
+        {
+            Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
+            Console.WriteLine("Enter a note (optional): ");
+
+            string input = Console.ReadLine() ?? "";
+            if (input.Trim().ToLower() == "cancel") return "";
+
+            return input;
         }
     }
 }

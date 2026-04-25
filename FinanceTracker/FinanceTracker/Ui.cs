@@ -54,7 +54,7 @@ namespace FinanceTracker
             int idWidth = Math.Max(2, list.Max(t => t.Id.ToString().Length));
             int typeWidth = Math.Max(4, list.Max(t => t.Type.Length));
             int catWidth = Math.Max(8, list.Max(t => t.Category.Length));
-            int amountWidth = Math.Max(6, list.Max(t => t.Amount.ToString("0.00").Length));
+            int amountWidth = Math.Max(6, list.Max(t => t.Amount.ToString("C").Length));
             int dateWidth = 10;
 
             // header
