@@ -1,16 +1,10 @@
 ﻿
-using System.Data.Common;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Text.Json;
-using System.Threading;
-using System.Transactions;
 /*
  TODO:
     🔎 Search system ...coming soon
     📊 category breakdown ...coming later
     💾 backup system  x
-    ✏️ edit transaction ...work in progress
+    ✏️ edit transaction x
     
 
    x  create a folder for the data to keep cleaner
@@ -22,40 +16,32 @@ using System.Transactions;
 
      add a transaction manager (a class that owns the data) so it's safer for the data
  */
+using System.Transactions;
+
 namespace FinanceTracker
 {
     public class FinanceTrackerApp
     {
-        private List<Transaction> transactions;//list for the transactions
-        private Dictionary<string, (string, Action)> menu;//dictionary for menu options
+        private TransactionManager manager = new TransactionManager();
+        private Dictionary<string, (string, Action)> menu = new();//dictionary for menu options
         private bool running = true;//bool to control menu loop inside Run method
-        private int nextId = 1;//integer to assign unique IDs to transactions. starts at 1 and increments with each new transaction
-        private FileStorage storage;
-
-        //constructor to set up data file path
-        public FinanceTrackerApp()
-        {
-            transactions = new();
-            storage = new FileStorage();// create an instance for the FileStorage
-        }
-
-
+        private FileStorage storage = new FileStorage();
 
         public void Run()
         {
-            storage.LoadData();
-            nextId = transactions.Any() ? transactions.Max(t => t.Id) + 1 : 1;
+            manager.Load(storage.LoadData());
 
             //initialize menu with option number, description, and method to call
             menu = new Dictionary<string, (string, Action)>()
             {
                 {"1", ("Add Transaction", AddTransaction)},
-                {"2", ("Cancel most recent transaction", CancelTransaction)},
-                {"3", ("View all transactions", ViewAll)},
-                {"4", ("Filtered View", FilteredView)},
-                {"5", ("View summary", ViewSummary)},
-                {"6", ("Export & open CSV", () => storage.ExportCsv(transactions))},
-                {"7", ("Exit", () =>{ running = false; }) }
+                {"2", ("Cancel most recent transaction", UndoLastTransaction)},
+                {"3", ("Edit Transaction",EditTransaction)},
+                {"4", ("View all transactions", ViewAll)},
+                {"5", ("Filtered View", FilteredView)},
+                {"6", ("View summary", ViewSummary)},
+                {"7", ("Export & open CSV", () => storage.ExportCsv(manager.Transactions.ToList()))},
+                {"8", ("Exit", () =>{ running = false; }) }
             };
 
             while (running)
@@ -70,12 +56,12 @@ namespace FinanceTracker
                 }
 
                 //check for valid input
-                string input = Console.ReadLine().Trim();
+                string input = Console.ReadLine()?.Trim()??"";
 
                 //try to get the selected option from the menu dictionary. if it doesn't exist, show error and continue loop
                 if (!menu.TryGetValue(input, out var selection))
                 {
-                    Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid option. Please enter 1-7.");
+                    Ui.Message(ConsoleColor.Red, "[ERROR]", $"Invalid option. Please enter 1-{menu.Count}.");
                     Pause();
                     continue;  
                 }
@@ -102,7 +88,7 @@ namespace FinanceTracker
             Console.WriteLine("Enter transaction type (expense/-) or (income/+):");
             Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
 
-            string type = Console.ReadLine().ToLower().Trim();
+            string type = Console.ReadLine()?.ToLower().Trim()??"";
 
             if (type == "cancel") return;
 
@@ -110,7 +96,7 @@ namespace FinanceTracker
             {
                 Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter 'expense/-' or 'income/+':");
 
-                type = Console.ReadLine().ToLower().Trim();
+                type = Console.ReadLine()?.ToLower().Trim()??"";
 
                 if (type == "cancel") return;
             }
@@ -130,7 +116,7 @@ namespace FinanceTracker
             Console.Write("Enter transaction category: ");
             Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
 
-            string category = Console.ReadLine().ToLower();
+            string category = Console.ReadLine()?.ToLower()??"";
 
             if (string.IsNullOrEmpty(category))
             {
@@ -145,7 +131,7 @@ namespace FinanceTracker
 
             decimal amount;
             
-            string amountInput = Console.ReadLine();
+            string amountInput = Console.ReadLine()??"";
 
             if (amountInput?.Trim().ToLower() == "cancel") return;
 
@@ -153,7 +139,7 @@ namespace FinanceTracker
             {
                 Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter a positive number: ");
 
-                amountInput = Console.ReadLine();
+                amountInput = Console.ReadLine()??"";
 
                 if (amountInput?.Trim().ToLower() == "cancel") return;
             }
@@ -173,7 +159,7 @@ namespace FinanceTracker
 
             DateTime date = DateTime.Now;
 
-            string dateInput = Console.ReadLine();
+            string dateInput = Console.ReadLine()??"";
             if (!string.IsNullOrEmpty(dateInput))
             {
                 if (dateInput.Trim().ToLower() == "cancel") return;
@@ -181,7 +167,7 @@ namespace FinanceTracker
                 while (!DateTime.TryParse(dateInput, out date))
                 {
                     Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter a valid date (yyyy-mm-dd) or press Enter to use today's date: ");
-                    dateInput = Console.ReadLine();
+                    dateInput = Console.ReadLine()??"";
 
                     if (string.IsNullOrEmpty(dateInput))
                     {
@@ -199,7 +185,7 @@ namespace FinanceTracker
             Console.WriteLine("Enter a note (optional): ");
             Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
 
-            string note = Console.ReadLine();
+            string note = Console.ReadLine()??"";
 
             if (!string.IsNullOrEmpty(note))
             {
@@ -207,21 +193,18 @@ namespace FinanceTracker
                 transaction.Note = note ?? "";
             }
 
-            //assign unique ID to transaction and increment NextId for the next transaction
-            transaction.Id = nextId++;
-
             //add to list
-            transactions.Add(transaction);
+            manager.Add(transaction);
 
             //save to file (JSON)
-            storage.SaveData(transactions);
+            storage.SaveData(manager.Transactions.ToList());
             Ui.Message(ConsoleColor.Green, "[SUCCESS]", "Transaction saved!.");
 
         }
-        public void CancelTransaction()
+        public void UndoLastTransaction()
         {
             //exit early if no transactions to remove
-            if (transactions.Count == 0)
+            if (manager.Transactions.Count == 0)
             {
                 Ui.Message(ConsoleColor.Cyan, "[INFO]", "No transactions to remove.");
                 return;
@@ -229,19 +212,18 @@ namespace FinanceTracker
 
             //confirm cancellation with user, showing details of most recent transaction
             Ui.Message(ConsoleColor.Yellow, "[WARN]", "This will remove the most recent transaction.");
-            Ui.PrintTransactions(new[] { transactions.Last() });// Converts single transaction into IEnumerable for PrintTransactions compatibility
+            Ui.PrintTransactions(new[] { manager.Transactions.Last() });// Converts single transaction into IEnumerable for PrintTransactions compatibility
             Ui.Message(ConsoleColor.Yellow, "", "Are you sure? [y/n]");
 
             char confirm;
 
-            while (!char.TryParse(Console.ReadLine().ToLower().Trim(), out confirm) || (confirm != 'y' && confirm != 'n')) Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter 'y' or 'n':");
+            while (!char.TryParse(Console.ReadLine()?.ToLower().Trim(), out confirm) || (confirm != 'y' && confirm != 'n')) Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter 'y' or 'n':");
 
             if (confirm == 'y')
             {
-                transactions.RemoveAt(transactions.Count - 1);
-                nextId = transactions.Count > 0 ? transactions.Max(t => t.Id) + 1 : 1; // update NextId after removal
+                manager.Remove(manager.Transactions.Last().Id);
 
-                storage.SaveData(transactions);
+                storage.SaveData(manager.Transactions.ToList());
 
                 Ui.Message(ConsoleColor.Green, "[SUCCESS]", "Most recent transaction removed.");
             }
@@ -255,28 +237,34 @@ namespace FinanceTracker
             int id;
             string idInput;
 
-            if (transactions.Count == 0)
+            if (manager.Transactions.Count == 0)
             {
                 Ui.Message(ConsoleColor.Cyan, "[INFO]", "No transactions to edit.");
                 return;
             }
 
             Console.Write("Enter Id to edit: ");
-            idInput = Console.ReadLine().Trim().ToLower();
+            idInput = Console.ReadLine()?.Trim().ToLower()??"";
 
             if (idInput == "cancel") return;
 
-            while (!int.TryParse(idInput, out id)|| !transactions.Any(t=>t.Id==id)) {
+            while (!int.TryParse(idInput, out id)|| manager.GetById(id)==null){
 
                 Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid ID. Please enter a valid transaction ID:");
-                idInput = Console.ReadLine().Trim().ToLower();
+                idInput = Console.ReadLine()?.Trim().ToLower()??"";
                 if (idInput == "cancel") return;
             }
 
-            Transaction t=transactions.First(t=>t.Id==id);//reference to the transaction 
+            Transaction? t=manager.GetById(id);//reference to the transaction 
+
+            if (t == null)
+            {
+                Ui.Message(ConsoleColor.Red, "[ERROR]", "Transaction not found.");
+                return;
+            }
 
             Console.Write("Enter field to edit (type, category, amount, date, note): ");
-            string field = Console.ReadLine().Trim().ToLower();
+            string field = Console.ReadLine()?.Trim().ToLower()??"";
 
             switch (field)
             {
@@ -285,7 +273,7 @@ namespace FinanceTracker
                     Console.WriteLine("Enter transaction type (expense/-) or (income/+):");
                     Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
 
-                    string type = Console.ReadLine().ToLower().Trim();
+                    string type = Console.ReadLine()?.ToLower().Trim()??"";
 
                     if (type == "cancel") return;
 
@@ -293,7 +281,7 @@ namespace FinanceTracker
                     {
                         Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter 'expense/-' or 'income/+':");
 
-                        type = Console.ReadLine().ToLower().Trim();
+                        type = Console.ReadLine()?.ToLower().Trim()??"";
 
                         if (type == "cancel") return;
                     }
@@ -309,7 +297,7 @@ namespace FinanceTracker
                     Console.Write("Enter transaction category: ");
                     Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
 
-                    string category = Console.ReadLine().ToLower();
+                    string category = Console.ReadLine()?.ToLower()??"";
 
                     if (string.IsNullOrEmpty(category))
                     {
@@ -320,14 +308,14 @@ namespace FinanceTracker
 
                     break;
 
-                case "Amount":
+                case "amount":
                     //edit amount
                     decimal amount;
 
                     Console.Write("Enter transaction amount: ");
                     Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
 
-                    string amountInput = Console.ReadLine();
+                    string amountInput = Console.ReadLine()??"";
 
                     if (amountInput?.Trim().ToLower() == "cancel") return;
 
@@ -335,7 +323,7 @@ namespace FinanceTracker
                     {
                         Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter a positive number: ");
 
-                        amountInput = Console.ReadLine();
+                        amountInput = Console.ReadLine()??"";
 
                         if (amountInput?.Trim().ToLower() == "cancel") return;
                     }
@@ -351,7 +339,7 @@ namespace FinanceTracker
                     Console.Write("Enter transaction date (yyyy-mm-dd) or press Enter to use today's date: ");
                     Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
 
-                    string dateInput = Console.ReadLine().Trim();
+                    string dateInput = Console.ReadLine()?.Trim()??"";
                     if (dateInput.ToLower() == "cancel") return;
 
                     DateTime date;
@@ -359,7 +347,7 @@ namespace FinanceTracker
                     while (!DateTime.TryParse(dateInput, out date))
                     {
                         Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter a valid date (yyyy-mm-dd):");
-                        dateInput = Console.ReadLine().Trim();
+                        dateInput = Console.ReadLine()?.Trim()??"";
                         if (dateInput.ToLower() == "cancel") return;//it returns early so the value stays the same
                     }
 
@@ -373,7 +361,7 @@ namespace FinanceTracker
                     Console.WriteLine("Enter a note (optional): ");
                     Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
 
-                    string note = Console.ReadLine();
+                    string note = Console.ReadLine()??"";
 
                     if (!string.IsNullOrEmpty(note))
                     {
@@ -386,24 +374,24 @@ namespace FinanceTracker
                     Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid field.");
                     return;
             }
-            storage.SaveData(transactions);
+            storage.SaveData(manager.Transactions.ToList());
             Ui.Message(ConsoleColor.Green, "[SUCCESS]", "Transaction saved!.");
 
         }
         public void ViewAll()
         {
-            if (transactions.Count == 0)
+            if (manager.Transactions.Count == 0)
             {
                 Ui.Message(ConsoleColor.Cyan, "[INFO]", "No transactions to view.");
                 return;
             }
 
             //display all transactions in a readable format
-            Ui.PrintTransactions(transactions);
+            Ui.PrintTransactions(manager.Transactions);
         }
         public void FilteredView()
         {
-            if (transactions.Count == 0)
+            if (manager.Transactions.Count == 0)
             {
                 Ui.Message(ConsoleColor.Cyan, "[INFO]", "No transactions to filter.");
                 return;
@@ -418,26 +406,26 @@ namespace FinanceTracker
             DateTime dateEnd = DateTime.MaxValue;
 
             Console.WriteLine("Enter start date (yyyy-mm-dd) or press Enter to skip: ");
-            dateStartInput = Console.ReadLine();
+            dateStartInput = Console.ReadLine()??"";
 
             if (!string.IsNullOrEmpty(dateStartInput))
             {
                 while (!DateTime.TryParse(dateStartInput, out dateStart))
                 {
                     Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter a valid date (yyyy-mm-dd):");
-                    dateStartInput = Console.ReadLine();
+                    dateStartInput = Console.ReadLine()??"";
                 }
             }
 
             Console.WriteLine("Enter end date (yyyy-mm-dd) or press Enter to skip: ");
-            dateEndInput = Console.ReadLine();
+            dateEndInput = Console.ReadLine() ?? "";
 
             if (!string.IsNullOrEmpty(dateEndInput))
             {
                 while (!DateTime.TryParse(dateEndInput, out dateEnd))
                 {
                     Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter a valid date (yyyy-mm-dd):");
-                    dateEndInput = Console.ReadLine();
+                    dateEndInput = Console.ReadLine() ?? "";
                 }
             }
 
@@ -446,10 +434,10 @@ namespace FinanceTracker
 
             Console.WriteLine("Enter category to filter by or press Enter to skip: ");
 
-            string categoryFilter = Console.ReadLine().ToLower().Trim();
+            string? categoryFilter = Console.ReadLine()?.ToLower().Trim();
 
             //filter and display transactions
-            var filtered = transactions.Where(t => (string.IsNullOrEmpty(categoryFilter) || t.Category.Contains(categoryFilter)) && t.Date >= dateStart && t.Date <= dateEnd);
+            var filtered = manager.Transactions.Where(t => (string.IsNullOrEmpty(categoryFilter) || t.Category.Contains(categoryFilter)) && t.Date >= dateStart && t.Date <= dateEnd);
 
             if (!filtered.Any())
             {
@@ -462,8 +450,8 @@ namespace FinanceTracker
         }
         public void ViewSummary()
         {
-            decimal totalIncome = transactions.Where(t => t.Amount >= 0).Sum(t => t.Amount);
-            decimal totalExpense = transactions.Where(t => t.Amount < 0).Sum(t => t.Amount);
+            decimal totalIncome = manager.Transactions.Where(t => t.Amount >= 0).Sum(t => t.Amount);
+            decimal totalExpense = manager.Transactions.Where(t => t.Amount < 0).Sum(t => t.Amount);
             decimal balance = totalIncome + totalExpense;
 
             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -473,7 +461,7 @@ namespace FinanceTracker
             Ui.Message(ConsoleColor.Cyan, "Balance", $"{balance:C}");
             Ui.Message(ConsoleColor.Green, "Income", $"{totalIncome:C}");
             Ui.Message(ConsoleColor.Red, "Expenses", $"{totalExpense:C}");
-            Ui.BarChart(transactions);
+            Ui.BarChart(manager.Transactions.ToList());
         }
         public void Pause()
         {
