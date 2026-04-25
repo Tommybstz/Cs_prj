@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="AutoTyper/AutoTyper.csproj" Id="1aac464a-9598-41fb-9184-2bece8cc4783" />
   <Project Path="FinanceTracker/FinanceTracker.csproj" />
 </Solution>

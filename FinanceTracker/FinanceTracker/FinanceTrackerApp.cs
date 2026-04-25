@@ -5,7 +5,7 @@
     📊 category breakdown ...coming later
     💾 backup system  x
     ✏️ edit transaction x
-    
+    Delete Stress tester on release
 
    x  create a folder for the data to keep cleaner
    x  and use the path combine when saving and loading to ensure it works on all operating systems. for now it just saves in the same directory as the application which is simpler but can get cluttered.
@@ -46,7 +46,7 @@ namespace FinanceTracker
             while (running)
             {
                 //clear console for a clean menu display each time
-                Console.Clear();
+                Console.Clear(); // for testing:    try { Console.Clear(); } catch (IOException) { }
 
                 //print menu
                 foreach (var option in menu)
@@ -61,7 +61,7 @@ namespace FinanceTracker
                 if (!menu.TryGetValue(input, out var selection))
                 {
                     Ui.Message(ConsoleColor.Red, "[ERROR]", $"Invalid option. Please enter 1-{menu.Count}.");
-                    Pause();
+                    Pause(); //for testing comment the pauses
                     continue;  
                 }
 
