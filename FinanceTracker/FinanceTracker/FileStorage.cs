@@ -9,14 +9,19 @@ namespace FinanceTracker
     internal class FileStorage
     {
         private readonly string dataFolder = "UserData";
+        private readonly string backupFolder;
         private readonly string dataFile;
         private readonly string backupFile;
 
         public FileStorage()
         {
+            backupFolder = Path.Combine(dataFolder, "Backups");
+
             dataFile = Path.Combine(dataFolder, "FinanceTrackerData.json");//set the data file path to be inside the UserData folder. this keeps the application directory cleaner and allows for better organization of user data.
-            backupFile = Path.Combine(dataFolder, $"FTD_backup_{DateTime.Today:yyyy-MM-dd}.json");
+            backupFile = Path.Combine(backupFolder, $"FTD_backup_{DateTime.Today:yyyy-MM-dd}.json");
+
             Directory.CreateDirectory(dataFolder);//ensure the data folder exists. if it already exists, this does nothing
+            Directory.CreateDirectory(backupFolder);
         }
         public void ExportCsv(List<Transaction> transactions)
         {
@@ -97,7 +102,7 @@ namespace FinanceTracker
         public void CleanOldBackups()
         {
 
-            var backups = Directory.GetFiles(dataFolder, "FTD_backup_*.json");
+            var backups = Directory.GetFiles(backupFolder, "FTD_backup_*.json");
 
             if (!backups.Any())
             {

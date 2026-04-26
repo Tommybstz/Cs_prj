@@ -1,10 +1,55 @@
 ﻿
 using System.Diagnostics.Contracts;
+using System.Transactions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace FinanceTracker
 {
     public static class Ui
     {
+        public static void CategoryBreakDown(List<Transaction>transactions,int year)
+        {
+            //get expenses from chosen year and groups them by month then sorts it
+            var byMonth = transactions
+                .Where(t => t.Type == "expense" && t.Date.Year==year)
+                .GroupBy(t => new { t.Date.Year, t.Date.Month })
+                .OrderByDescending(g => g.Key.Year)
+                .ThenByDescending(g => g.Key.Month);
+
+            decimal? prevTotal=null;
+
+            foreach (var month in byMonth)
+            {
+                //month header
+                decimal monthTotal = month.Sum(t => Math.Abs(t.Amount));
+                Console.WriteLine($"\n{new DateTime(month.Key.Year, month.Key.Month, 1):MMMM yyyy}    Total: {monthTotal:C}");//prints the month name and the total
+
+                if (prevTotal != null)//check if there is a month before
+                {
+                    decimal diff = monthTotal - prevTotal.Value;//calculate the difference between months
+                    if (diff > 0)
+                        Ui.Message(ConsoleColor.Red, "", $"  ▲ {diff:C} more than last month");//you spent more
+                    else
+                        Ui.Message(ConsoleColor.Green, "", $"  ▼ {Math.Abs(diff):C} less than last month");//you spent less
+                }
+
+                //category breakdown
+                var byCategory = month.GroupBy(t => t.Category)
+                    .Select(g => new { Category = g.Key, Total = Math.Abs(g.Sum(t => t.Amount)), Count = g.Count() });
+
+                foreach (var cat in byCategory)
+                {
+
+                    decimal percentage = monthTotal == 0 ? 0 : cat.Total / monthTotal * 100;
+                    int barLength = (int)(cat.Total / monthTotal * 20);
+                    string bar = new string('█', barLength) + new string('-', 20 - barLength);
+                    Console.WriteLine($"  {cat.Category,-15} | {bar} {cat.Total:C}  {percentage:F1}%  {cat.Count} transactions");
+                }
+                prevTotal = monthTotal;
+            }
+
+
+        }
         public static void BarChart(List<Transaction> transactions)
         {
             var grouped = transactions

@@ -17,6 +17,8 @@
    x  add a transaction manager (a class that owns the data) so it's safer for the data
  */
 
+using System.Reflection.Metadata.Ecma335;
+
 namespace FinanceTracker
 {
     public class FinanceTrackerApp
@@ -36,11 +38,12 @@ namespace FinanceTracker
                 {"1", ("Add Transaction", AddTransaction)},
                 {"2", ("Cancel most recent transaction", UndoLastTransaction)},
                 {"3", ("Edit Transaction",EditTransaction)},
-                {"4", ("View all transactions", ViewAll)},
-                {"5", ("Filtered View", FilteredView)},
-                {"6", ("View summary", ViewSummary)},
-                {"7", ("Export & open CSV", () => storage.ExportCsv(manager.Transactions.ToList()))},
-                {"8", ("Exit", () =>{ running = false; }) }
+                {"4", ("Remove transaction ",RemoveById)},
+                {"5", ("View all transactions", ViewAll)},
+                {"6", ("Filtered View", FilteredView)},
+                {"7", ("View summary", ViewSummary)},
+                {"8", ("Export & open CSV", () => storage.ExportCsv(manager.Transactions.ToList()))},
+                {"9", ("Exit", () =>{ running = false; }) }
             };
 
             while (running)
@@ -85,7 +88,8 @@ namespace FinanceTracker
             if (type == null) return; // user cancelled
 
             // get category, defaults to "generic" if left blank
-            string category = PromptCategory();
+            string category = PromptCategory()??"generic";
+            if (category == null) return;
 
             // get amount, must be a positive number
             decimal? amount = PromptAmount();
@@ -210,7 +214,7 @@ namespace FinanceTracker
 
                 case "category":
                     // edit category, defaults to "generic" if left blank
-                    t.Category = PromptCategory();
+                    t.Category = PromptCategory()??"generic";
                     break;
 
                 case "amount":
@@ -254,68 +258,85 @@ namespace FinanceTracker
         }
         public void FilteredView()
         {
+            bool filterRunning=true;
+            var activeFilters = new List<Func<Transaction,bool>>(); //contains the lambdas/functions
+            var filterMenu = new Dictionary<string, (string, Func<Func<Transaction, bool>?>?)>()
+            {
+                {"1", ("Filter by type", FilterByType)},
+                {"2", ("Filter by category", FilterByCategory)},
+                {"3", ("Filter by amount", FilterByAmount)},
+                {"4", ("Filter by date", FilterByDate)},
+                {"5", ("Run", null)},
+                {"6", ("Exit", null)}
+            };
+
             if (manager.Transactions.Count == 0)
             {
                 Ui.Message(ConsoleColor.Cyan, "[INFO]", "No transactions to filter.");
                 return;
             }
 
-            //date range
-
-            string dateStartInput;
-            string dateEndInput;
-
-            DateTime dateStart = DateTime.MinValue;
-            DateTime dateEnd = DateTime.MaxValue;
-
-            Console.WriteLine("Enter start date (yyyy-mm-dd) or press Enter to skip: ");
-            dateStartInput = Console.ReadLine()??"";
-
-            if (!string.IsNullOrEmpty(dateStartInput))
+            while (filterRunning)
             {
-                while (!DateTime.TryParse(dateStartInput, out dateStart))
+                //clear console for a clean menu display each time
+                Console.Clear();
+
+                //print menu
+                foreach (var option in filterMenu)
                 {
-                    Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter a valid date (yyyy-mm-dd):");
-                    dateStartInput = Console.ReadLine()??"";
+                    Console.WriteLine($"{option.Key}. {option.Value.Item1}");
                 }
-            }
 
-            Console.WriteLine("Enter end date (yyyy-mm-dd) or press Enter to skip: ");
-            dateEndInput = Console.ReadLine() ?? "";
+                //check for valid input
+                string input = Console.ReadLine()?.Trim() ?? "";
 
-            if (!string.IsNullOrEmpty(dateEndInput))
-            {
-                while (!DateTime.TryParse(dateEndInput, out dateEnd))
+                if (input == "6") return;
+                if (input == "5") filterRunning=false;
+
+                //try to get the selected option from the menu dictionary. if it doesn't exist, show error and continue loop
+                if (!filterMenu.TryGetValue(input, out var selection))
                 {
-                    Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter a valid date (yyyy-mm-dd):");
-                    dateEndInput = Console.ReadLine() ?? "";
+                    Ui.Message(ConsoleColor.Red, "[ERROR]", $"Invalid option. Please enter 1-{filterMenu.Count}.");
+                    Pause();
+                    continue;
                 }
+
+                // get the function
+                if (selection.Item2 != null)
+                {
+                    var filter = selection.Item2();
+                    if (filter != null)
+                        activeFilters.Add(filter);
+                }
+
+
             }
 
+                //checks if list is empty
+                if (activeFilters.Count == 0)
+                {
+                    Ui.Message(ConsoleColor.Cyan, "[INFO]", "No filters selected.");
+                    return;
+                }
 
-            //category filter
+                //apply the filters
+                var filtered = manager.Transactions.AsEnumerable();//filtered list
 
-            Console.WriteLine("Enter category to filter by or press Enter to skip: ");
+                foreach (var filter in activeFilters)//loop trough the active filters and apply them
+                {
+                    filtered = filtered.Where(filter);//apply filter
+                }
 
-            string? categoryFilter = Console.ReadLine()?.ToLower().Trim();
-
-            //filter and display transactions
-            var filtered = manager.Transactions.Where(t => (string.IsNullOrEmpty(categoryFilter) || t.Category.Contains(categoryFilter)) && t.Date >= dateStart && t.Date <= dateEnd);
-
-            if (!filtered.Any())
-            {
-                Ui.Message(ConsoleColor.Cyan, "[INFO]", "No transactions match the filter criteria.");
-                return;
-            }
-
-            Ui.PrintTransactions(filtered);
-
+                Ui.PrintTransactions(filtered);
         }
         public void ViewSummary()
         {
             decimal totalIncome = manager.Transactions.Where(t => t.Amount >= 0).Sum(t => t.Amount);
             decimal totalExpense = manager.Transactions.Where(t => t.Amount < 0).Sum(t => t.Amount);
             decimal balance = totalIncome + totalExpense;
+            int year = DateTime.Now.Year; 
+            string yearInput;
+
 
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("\n================ SUMMARY ================");
@@ -325,6 +346,28 @@ namespace FinanceTracker
             Ui.Message(ConsoleColor.Green, "Income", $"{totalIncome:C}");
             Ui.Message(ConsoleColor.Red, "Expenses", $"{totalExpense:C}");
             Ui.BarChart(manager.Transactions.ToList());
+
+            Console.WriteLine("Enter the year you want to see or press enter to see this year:");
+            yearInput = Console.ReadLine()?.Trim()??"";
+
+            //gets year input and if its empty it leaves it as the current year
+            if (!string.IsNullOrEmpty(yearInput)){
+                while (!int.TryParse(yearInput, out year))
+                {
+                    Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid year. Please enter a valid year:");
+                    yearInput = Console.ReadLine()?.Trim() ?? "";
+
+                    if (string.IsNullOrEmpty(yearInput)) break;
+                }
+            }
+
+            if (!manager.Transactions.Any(t => t.Date.Year == year))//checks if there are transactions for that year
+            {
+                Ui.Message(ConsoleColor.Cyan, "[INFO]", "No transactions found for that year.");
+                return;
+            }
+
+            Ui.CategoryBreakDown(manager.Transactions.ToList(),year);
         }
         public void Pause()
         {
@@ -332,7 +375,7 @@ namespace FinanceTracker
             Console.ReadKey();
         }
 
-        //helpers
+        // --- helpers ---
         private int? PromptId()
         {
             Ui.PrintTransactions(manager.Transactions);
@@ -367,12 +410,13 @@ namespace FinanceTracker
 
             return input == "-" ? "expense" : input == "+" ? "income" : input;
         }
-        private string PromptCategory()
+        private string? PromptCategory()
         {
             Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
             Console.Write("Enter transaction category: ");
 
             string input = Console.ReadLine()?.ToLower() ?? "";
+            if (input == "cancel") return null;
             return string.IsNullOrEmpty(input) ? "generic" : input;
         }
         private decimal? PromptAmount()
@@ -417,12 +461,118 @@ namespace FinanceTracker
         private string PromptNote()
         {
             Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
-            Console.WriteLine("Enter a note (optional): ");
+            Console.Write("Enter a note (optional): ");
 
-            string input = Console.ReadLine() ?? "";
+            string input = Console.ReadLine()?.Trim().ToLower() ?? "";
             if (input.Trim().ToLower() == "cancel") return "";
 
             return input;
         }
+
+        // --- Filtered View Helpers ---
+        private Func<Transaction,bool>? FilterByDate()//returns true if the transaction matches the filter (it keeps it)
+        {
+
+            string dateStartInput;
+            string dateEndInput;
+
+            DateTime dateStart = DateTime.MinValue;
+            DateTime dateEnd = DateTime.MaxValue;
+
+            Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
+            Console.Write("Enter start date (yyyy-mm-dd) or press Enter to skip: ");
+            dateStartInput = Console.ReadLine()?.Trim().ToLower() ?? "";
+            if(dateStartInput=="cancel") return null;
+
+            if (!string.IsNullOrEmpty(dateStartInput))
+            {
+                while (!DateTime.TryParse(dateStartInput, out dateStart))
+                {
+                    Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter a valid date (yyyy-mm-dd):");
+                    dateStartInput = Console.ReadLine()?.Trim().ToLower() ?? "";
+                    if(dateStartInput=="cancel") return null;
+                }
+            }
+
+            Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
+            Console.Write("Enter end date (yyyy-mm-dd) or press Enter to skip: ");
+            dateEndInput = Console.ReadLine()?.Trim().ToLower() ?? "";
+            if (dateEndInput == "cancel") return null;
+
+            if (!string.IsNullOrEmpty(dateEndInput))
+            {
+                while (!DateTime.TryParse(dateEndInput, out dateEnd))
+                {
+                    Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter a valid date (yyyy-mm-dd):");
+                    dateEndInput = Console.ReadLine()?.Trim().ToLower() ?? "";
+                    if (dateEndInput == "cancel") return null;
+                }
+            }
+            return t=> t.Date>=dateStart && t.Date<=dateEnd;
+        }
+        private Func<Transaction, bool>? FilterByCategory()
+        {
+            Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
+            Console.Write("Enter category to filter by or press Enter to skip: ");
+
+            string? categoryFilter = Console.ReadLine()?.ToLower().Trim();
+
+            if(categoryFilter=="cancel") return null;
+
+            if (string.IsNullOrEmpty(categoryFilter)) return t => true;
+            return t=> t.Category.Contains(categoryFilter);
+        }
+        private Func<Transaction, bool>? FilterByAmount()
+        {
+
+            string amountInputMin;
+            string amountInputMax;
+
+            decimal amountMin = decimal.MinValue;
+            decimal amountMax = decimal.MaxValue;
+
+            Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
+            Console.Write("Enter the minumum amount: ");
+
+            amountInputMin = Console.ReadLine()?.Trim().ToLower() ?? "";
+            if (amountInputMin == "cancel") return null;
+
+            if (!string.IsNullOrEmpty(amountInputMin))
+            {
+                while (!decimal.TryParse(amountInputMin, out amountMin))
+                {
+                    Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter a positive number:");
+                    amountInputMin = Console.ReadLine()?.Trim().ToLower() ?? "";
+                    if (amountInputMin == "cancel") return null;
+                }
+            }
+
+            Ui.Message(ConsoleColor.Cyan, "[INFO]", "Type 'cancel' at any time to return to the menu.");
+            Console.Write("Enter the maximum amount: ");
+
+            amountInputMax = Console.ReadLine()?.Trim().ToLower() ?? "";
+            if (amountInputMax == "cancel") return null;
+
+            if (!string.IsNullOrEmpty(amountInputMax))
+            {
+                while (!decimal.TryParse(amountInputMax, out amountMax))
+                {
+                    Ui.Message(ConsoleColor.Red, "[ERROR]", "Invalid input. Please enter a positive number:");
+                    amountInputMax = Console.ReadLine()?.Trim().ToLower() ?? "";
+                    if (amountInputMin == "cancel") return null;
+                }
+            }
+
+            return t=> Math.Abs(t.Amount) >= amountMin && Math.Abs(t.Amount)<=amountMax;
+        }
+        private Func<Transaction, bool>? FilterByType() 
+        {
+            string? type = PromptType();
+
+            if (type == null) return null;
+
+            return t => t.Type==type;
+        }
+
     }
 }
