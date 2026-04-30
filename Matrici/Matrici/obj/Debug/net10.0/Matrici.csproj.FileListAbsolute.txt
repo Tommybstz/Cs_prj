@@ -1,0 +1,14 @@
+C:\Users\ai2024\Desktop\c#\Matrici\Matrici\bin\Debug\net10.0\Matrici.exe
+C:\Users\ai2024\Desktop\c#\Matrici\Matrici\bin\Debug\net10.0\Matrici.deps.json
+C:\Users\ai2024\Desktop\c#\Matrici\Matrici\bin\Debug\net10.0\Matrici.runtimeconfig.json
+C:\Users\ai2024\Desktop\c#\Matrici\Matrici\bin\Debug\net10.0\Matrici.dll
+C:\Users\ai2024\Desktop\c#\Matrici\Matrici\bin\Debug\net10.0\Matrici.pdb
+C:\Users\ai2024\Desktop\c#\Matrici\Matrici\obj\Debug\net10.0\Matrici.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ai2024\Desktop\c#\Matrici\Matrici\obj\Debug\net10.0\Matrici.AssemblyInfoInputs.cache
+C:\Users\ai2024\Desktop\c#\Matrici\Matrici\obj\Debug\net10.0\Matrici.AssemblyInfo.cs
+C:\Users\ai2024\Desktop\c#\Matrici\Matrici\obj\Debug\net10.0\Matrici.csproj.CoreCompileInputs.cache
+C:\Users\ai2024\Desktop\c#\Matrici\Matrici\obj\Debug\net10.0\Matrici.dll
+C:\Users\ai2024\Desktop\c#\Matrici\Matrici\obj\Debug\net10.0\refint\Matrici.dll
+C:\Users\ai2024\Desktop\c#\Matrici\Matrici\obj\Debug\net10.0\Matrici.pdb
+C:\Users\ai2024\Desktop\c#\Matrici\Matrici\obj\Debug\net10.0\Matrici.genruntimeconfig.cache
+C:\Users\ai2024\Desktop\c#\Matrici\Matrici\obj\Debug\net10.0\ref\Matrici.dll
