@@ -39,11 +39,11 @@
         var matrice = new int[row, col];
 
         //caricamento dati
-        for (i = 0; i < row; i++)//iterazione righe
+        for (i = 0; i < matrice.GetLength(0); i++)//iterazione righe. GetLength al posto di Length dato che ci sono 2 indici (row,col)->(0,1)
         {
             //i aumenta alla fine del for interno
 
-            for (j = 0; j < col; j++) //iterazione colonne 
+            for (j = 0; j < matrice.GetLength(1); j++) //iterazione colonne 
             {
                 //input valore
                 Console.Write($"riga {i + 1}. inserire {j + 1} numero: ");
@@ -54,15 +54,60 @@
             }
         }
 
-        for (i = 0; i < row; i++)
+        // UI : stampa matrice
+        for (i = 0; i < matrice.GetLength(0); i++)
         {
+            Console.WriteLine(new string('-',col*5));
              
-            for (j = 0; j < col; j++) //iterazione colonne 
+            for (j = 0; j < matrice.GetLength(1); j++) //iterazione colonne 
             {
                 Console.Write($"| {matrice[i, j]} ");
             }
-            Console.WriteLine(new string('-',row*2));
+            Console.WriteLine("|");
         }
+
+        //esercizio
+        //calcolare e stampare la somma degli elementi riga per riga e colonna per colonna
+        int sommaRiga;
+        int sommaColonna;
+        var sommeRighe=new int[row];
+        var sommeColonne = new int[col];
+
+        //somma righe
+        for (i = 0;i < matrice.GetLength(0); i++)
+        {
+            sommaRiga = 0;
+
+            for (j = 0;j < matrice.GetLength(1); j++)
+            {
+                sommaRiga += matrice[i,j];
+            }
+            sommeRighe[i]=sommaRiga;
+        }
+
+        //somma colonne
+        for (j = 0; j < matrice.GetLength(1); j++)
+        {
+            sommaColonna = 0;
+
+            for (i = 0; i < matrice.GetLength(0); i++)
+            {
+                sommaColonna += matrice[i, j];
+            }
+            sommeColonne[j] = sommaColonna;
+        }
+
+        for (i = 0; i < sommeRighe.Length; i++)
+        {
+            Console.WriteLine($"\nLa somma della riga n°{i + 1} è {sommeRighe[i]}");
+
+            for(j = 0;j<sommeColonne.Length; j++)
+            {
+                Console.WriteLine($"La somma della colonna n°{i + 1} è {sommeColonne[j]}");
+            }
+        }
+
+
 
     }
 }
