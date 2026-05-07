@@ -25,9 +25,6 @@ class Program
                 tavolaPitagorica[i-1, j-1] = tavolaPitagorica[0, j-1] * tavolaPitagorica[i-1, 0];
             }
         }
-
-
-        for (int x = 0; x < 10; x++)
         {
             Console.WriteLine(new string('─', 10 * 5));
             for (int y = 0; y < 10; y++)
