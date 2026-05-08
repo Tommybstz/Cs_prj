@@ -1,4 +1,6 @@
-﻿class Program
+﻿using System.Runtime.InteropServices;
+
+class Program
 {
     static void Main()
     {
@@ -30,22 +32,66 @@
 
             while (true)
             {
+                
+                char position;
+                Console.Write("premere un tasto sul tastierino numerico per selezionare la posizione: ");
+                position=Console.ReadKey().KeyChar;
                 //input x axis
-                Console.Write("Inserire le coordinate (asse x)[1-3]: ");
-                while (!int.TryParse(Console.ReadLine(), out inputX) || inputX > 3 || inputX < 1)
+                switch (position)
                 {
-                    Message(ConsoleColor.Red, "[ERRORE]", "Valore non valido [1-3]");
+                    case '1':
+                        inputX = 2;
+                        inputY = 0;
+                        break;
+
+                    case '2':
+                        inputX = 2;
+                        inputY = 1;
+                        break;
+
+                    case '3':
+                        inputX = 2;
+                        inputY = 2;
+                        break;
+
+                    case '4':
+                        inputX = 1;
+                        inputY = 0;
+                        break;
+
+                    case '5':
+                        inputX = 1;
+                        inputY = 1;
+                        break;
+
+                    case '6':
+                        inputX = 1;
+                        inputY = 2;
+                        break;
+
+                    case '7':
+                        inputX = 0;
+                        inputY = 0;
+                        break;
+
+                    case '8':
+                        inputX = 0;
+                        inputY = 1;
+                        break;
+
+                    case '9':
+                        inputX = 0;
+                        inputY = 2;
+                        break;
+
+                    default:
+                        Console.WriteLine("posizione non valida");
+                        continue;
                 }
 
-                //input y axis
-                Console.Write("Inserire le coordinate (asse y[1-3]: ");
-                while (!int.TryParse(Console.ReadLine(), out inputY) || inputY > 3 || inputY < 1)
-                {
-                    Message(ConsoleColor.Red,"[ERRORE]", "Valore non valido [1-3]");
-                }
 
                 // check if the slot is occupied, if it is it skips to the next loop
-                if (trisTable[inputX - 1, inputY - 1] != '\0')
+                if (trisTable[inputX , inputY ] != '\0')
                 {
                     Message(ConsoleColor.Red, "[ERRORE]", "Casella già occupata!");
                     continue;
@@ -54,7 +100,7 @@
                 break;
             }
 
-            trisTable[inputX - 1, inputY - 1] = turn;
+            trisTable[inputX, inputY] = turn;
 
             //checks diagonals
             if (trisTable[0, 0] == trisTable[1, 1] && trisTable[0, 0] == trisTable[2, 2] && trisTable[0, 0] ==turn) //top-left -> bottom-right, and assign the winner X or O. 
