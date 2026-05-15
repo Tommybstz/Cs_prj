@@ -1,0 +1,15 @@
+C:\Users\tomma\OneDrive\Desktop\Cs_prj\Matrix_Row_Swap\Matrix_Row_Swap\bin\Debug\net10.0\Matrix_Row_Swap.exe
+C:\Users\tomma\OneDrive\Desktop\Cs_prj\Matrix_Row_Swap\Matrix_Row_Swap\bin\Debug\net10.0\Matrix_Row_Swap.deps.json
+C:\Users\tomma\OneDrive\Desktop\Cs_prj\Matrix_Row_Swap\Matrix_Row_Swap\bin\Debug\net10.0\Matrix_Row_Swap.runtimeconfig.json
+C:\Users\tomma\OneDrive\Desktop\Cs_prj\Matrix_Row_Swap\Matrix_Row_Swap\bin\Debug\net10.0\Matrix_Row_Swap.dll
+C:\Users\tomma\OneDrive\Desktop\Cs_prj\Matrix_Row_Swap\Matrix_Row_Swap\bin\Debug\net10.0\Matrix_Row_Swap.pdb
+C:\Users\tomma\OneDrive\Desktop\Cs_prj\Matrix_Row_Swap\Matrix_Row_Swap\obj\Debug\net10.0\Matrix_Row_Swap.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\tomma\OneDrive\Desktop\Cs_prj\Matrix_Row_Swap\Matrix_Row_Swap\obj\Debug\net10.0\Matrix_Row_Swap.AssemblyInfoInputs.cache
+C:\Users\tomma\OneDrive\Desktop\Cs_prj\Matrix_Row_Swap\Matrix_Row_Swap\obj\Debug\net10.0\Matrix_Row_Swap.AssemblyInfo.cs
+C:\Users\tomma\OneDrive\Desktop\Cs_prj\Matrix_Row_Swap\Matrix_Row_Swap\obj\Debug\net10.0\Matrix_Row_Swap.csproj.CoreCompileInputs.cache
+C:\Users\tomma\OneDrive\Desktop\Cs_prj\Matrix_Row_Swap\Matrix_Row_Swap\obj\Debug\net10.0\Matrix_Row_Swap.sourcelink.json
+C:\Users\tomma\OneDrive\Desktop\Cs_prj\Matrix_Row_Swap\Matrix_Row_Swap\obj\Debug\net10.0\Matrix_Row_Swap.dll
+C:\Users\tomma\OneDrive\Desktop\Cs_prj\Matrix_Row_Swap\Matrix_Row_Swap\obj\Debug\net10.0\refint\Matrix_Row_Swap.dll
+C:\Users\tomma\OneDrive\Desktop\Cs_prj\Matrix_Row_Swap\Matrix_Row_Swap\obj\Debug\net10.0\Matrix_Row_Swap.pdb
+C:\Users\tomma\OneDrive\Desktop\Cs_prj\Matrix_Row_Swap\Matrix_Row_Swap\obj\Debug\net10.0\Matrix_Row_Swap.genruntimeconfig.cache
+C:\Users\tomma\OneDrive\Desktop\Cs_prj\Matrix_Row_Swap\Matrix_Row_Swap\obj\Debug\net10.0\ref\Matrix_Row_Swap.dll
