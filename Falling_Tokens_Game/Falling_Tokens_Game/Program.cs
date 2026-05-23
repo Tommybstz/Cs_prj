@@ -6,6 +6,7 @@ class Program
     private readonly static int gameWidth = 6, gameHeight = 10;
 
     private static char[,] gameZone = new char[gameHeight, gameWidth];
+    private static char[,] lastFrame = new char[gameHeight, gameWidth];
     private static Random Token = new Random();
     public static int score = 0;
     private static StringBuilder frame = new StringBuilder();
@@ -31,7 +32,7 @@ class Program
 
         double tokenSpawnTime = 1.75; // spawn a token every x seconds
         double tokenMoveTime = 0.75; // move tokens every x seconds
-        double lastSpawn=0, lastFall=0;
+        double lastSpawn=0, lastFall=0, lastFpsCounter=0,lastFpsTime=0;
 
 
         for (int row = 0; row < gameZone.GetLength(0); row++)
@@ -39,12 +40,17 @@ class Program
             for (int col = 0; col < gameZone.GetLength(1); col++)
             {
                 gameZone[row, col] = empty;
+                lastFrame[row, col] = '\0';
             }
         }
+
 
         movePlayerInput.Start();
 
         stopwatch=Stopwatch.StartNew();
+
+        gameZone[9, playerPosition] = player;
+        DrawBorders();
 
         while (true)
         {
@@ -60,13 +66,18 @@ class Program
                 lastFall = stopwatch.Elapsed.TotalSeconds;
                 if(GameOver) break;
             }
-            fps = (int)(frameCounter / stopwatch.Elapsed.TotalSeconds);
+            if (stopwatch.Elapsed.TotalSeconds - lastFpsTime > 1)
+            {
+                fps = (int)(frameCounter - lastFpsCounter);
+                lastFpsCounter = frameCounter;
+                lastFpsTime = stopwatch.Elapsed.TotalSeconds;
+            }
             Draw();
-            Console.WriteLine();
             frameCounter++;
 
             //Thread.Sleep(frameTime);
         }
+        Console.SetCursorPosition(0, gameHeight * 2 + 3);
         Console.WriteLine("game over");
 
 
@@ -74,7 +85,6 @@ class Program
 
     static void MovePlayer()
     {
-        gameZone[9, playerPosition] = player;
         while (true)
         {
             if ( ! Console.KeyAvailable) continue;//check if a key is not pressed
@@ -103,30 +113,54 @@ class Program
         int elementSpawnPoint;
         elementSpawnPoint = Token.Next(gameZone.GetLength(1));
         gameZone[0, elementSpawnPoint] = token;//spawn a token at the top of the game zone
-    }   
+    }
 
-    static void Draw()
+    static void DrawBorders()
     {
-        //Build the frame to be drawn on the console
         Console.SetCursorPosition(0, 0);
-        frame.AppendLine($"Score: {score}");
+        frame.AppendLine($"Score: ");
         for (int row = 0; row < gameZone.GetLength(0); row++)
         {
             frame.AppendLine(new string('─', gameZone.GetLength(1) * 4 + 1));
 
             for (int col = 0; col < gameZone.GetLength(1); col++)
             {
-                frame.Append($"| {gameZone[row, col]} ");
+                frame.Append($"| {empty} ");
             }
             frame.AppendLine("|");
         }
         frame.AppendLine(new string('─', gameZone.GetLength(1) * 4 + 1));
-        frame.AppendLine($"FPS: {fps}");
+        frame.AppendLine($"FPS: ");
 
         Console.Write(frame.ToString());
         frame.Clear();
     }
-    static void Update()
+
+    static void Draw()//draw the game zone on the console, happens every frame
+    {
+        //Build the frame to be drawn on the console
+        Console.SetCursorPosition(7, 0);
+        Console.Write(score);
+        for (int row = 0; row < gameZone.GetLength(0); row++)
+        {
+
+            for (int col = 0; col < gameZone.GetLength(1); col++)
+            {
+                if(gameZone[row, col] != lastFrame[row, col])
+                {
+                    Console.SetCursorPosition(col * 4+2, row*2 + 2);
+                    Console.Write(gameZone[row, col]);
+                    lastFrame[row, col] = gameZone[row, col];
+                }
+            }
+        }
+
+        Console.SetCursorPosition(5, gameHeight * 2 + 2);
+        Console.Write(fps);
+
+    }
+
+    static void Update()//game logic
     {
         for(int row = gameZone.GetLength(0)-2; row >= 0; row--)
         {
@@ -155,7 +189,6 @@ class Program
                 
             }
         }
-
     }
 
 }
