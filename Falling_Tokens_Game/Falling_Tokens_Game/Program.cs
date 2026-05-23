@@ -13,8 +13,8 @@ class Program
     private static bool GameOver = false;
     private readonly static char player= '█', token= '☆', empty= ' ';
     private static int frameCounter = 0;
-    private static Stopwatch stopwatch;
     private static int fps;
+    private static Stopwatch stopwatch;
 
 
     //add a game loop that runs at a fixed frame rate and updates the game state and draws the game zone on the console
@@ -77,8 +77,8 @@ class Program
         gameZone[9, playerPosition] = player;
         while (true)
         {
-            if (Console.KeyAvailable)//check if a key is pressed
-            {
+            if ( ! Console.KeyAvailable) continue;//check if a key is not pressed
+
                 var key = Console.ReadKey(true).Key;
                 if (key == ConsoleKey.LeftArrow && playerPosition > 0)
                 {
@@ -93,7 +93,7 @@ class Program
                 else continue;
                 gameZone[gameZone.GetLength(0) - 1, oldPlayerPosition] = empty;//clear the old player position
                 gameZone[gameZone.GetLength(0) - 1, playerPosition]=player;
-            }
+            
 
         }
     }
@@ -132,8 +132,8 @@ class Program
         {
             for (int col = gameZone.GetLength(1)-1; col >= 0; col--)
             {
-                if (gameZone[row, col] == token)
-                {
+                if (gameZone[row, col] != token) continue;//check if there is a token at the current position, if not continue to the next position
+                
 
                     if(row+1 == gameZone.GetLength(0)-1 && gameZone[row+1,col] != player)
                     {
@@ -152,7 +152,7 @@ class Program
                         gameZone[row + 1, col] = token;
 
                     }
-                }
+                
             }
         }
 
