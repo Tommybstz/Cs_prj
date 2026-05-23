@@ -16,10 +16,12 @@ class Program
     private static int frameCounter = 0;
     private static int fps;
     private static Stopwatch stopwatch;
+    private static Queue<int> fpsHistory = new Queue<int>();//queue to store the fps values for the graph
 
 
     //add a game loop that runs at a fixed frame rate and updates the game state and draws the game zone on the console
     //add a warm up phase so that the fps target does +10 until it reaches the target fps, for exapmle if the target fps is 60, the game would run at 34 fps but every frame it increases by 10 or 1 until the actual fps reaches the target fps, at the end the fpsIncreaser would be like 600 or something like that, and the game would run at 60 fps, which would be like hardtyping 600 in the target fps
+    //"▁▂▃▄▅▆▇█" for the fps graph, add to a queue the fps value every second and if it's too big dequeue the oldest value,
     static void Main()
     {
         Console.OutputEncoding = Encoding.UTF8;
