@@ -2,7 +2,7 @@
 
 [![.NET](https://img.shields.io/badge/.NET-10.0-blue?logo=dotnet)](https://dotnet.microsoft.com/) [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-A collection of C# projects and exercises for school. This repository contains various code examples, assignments, and practice projects built with .NET 10.0.
+A collection of C# projects and exercises for school/personal. This repository contains various code examples, assignments, and practice projects built with .NET 10.0.
 
 ---
 
