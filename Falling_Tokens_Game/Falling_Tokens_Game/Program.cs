@@ -7,16 +7,22 @@ class Program
 
     private static char[,] gameZone = new char[gameHeight, gameWidth];
     private static char[,] lastFrame = new char[gameHeight, gameWidth];
-    private static Random Token = new Random();
-    public static int score = 0;
     private static StringBuilder frame = new StringBuilder();
+
+    private static Random Token = new Random();
+
+    public static int score = 0;
     private static int playerPosition = 4, oldPlayerPosition = 4;//starting position of the player in the middle of the game zone
     private static bool GameOver = false;
     private readonly static char player= '█', token= '☆', empty= ' ';
+
+    private static Stopwatch stopwatch;
     private static int frameCounter = 0;
     private static int fps;
-    private static Stopwatch stopwatch;
     private static Queue<int> fpsHistory = new Queue<int>();//queue to store the fps values for the graph
+    private static int fpsTarget = 60;
+    private static int fpsStabilized=fpsTarget;
+    private static int frameTime = 0;
 
 
     //add a game loop that runs at a fixed frame rate and updates the game state and draws the game zone on the console
@@ -28,9 +34,8 @@ class Program
         Console.CursorVisible = false;
 
         Thread movePlayerInput= new Thread(MovePlayer);
+        Thread FpsWarmUp = new Thread(FpsStabilizer);
 
-        int fpsTarget = 600;
-        int frameTime = 1000 / fpsTarget;
 
         double tokenSpawnTime = 1.75; // spawn a token every x seconds
         double tokenMoveTime = 0.75; // move tokens every x seconds
@@ -54,6 +59,7 @@ class Program
         gameZone[9, playerPosition] = player;
         DrawBorders();
 
+        FpsWarmUp.Start();
         while (true)
         {
             long frameStart = stopwatch.ElapsedMilliseconds;
@@ -77,12 +83,28 @@ class Program
             Draw();
             frameCounter++;
 
-            //Thread.Sleep(frameTime);
+           Thread.Sleep(frameTime);
         }
         Console.SetCursorPosition(0, gameHeight * 2 + 3);
         Console.WriteLine("game over");
 
 
+    }
+    static void FpsStabilizer()
+    {
+        while (true)
+        {
+            Thread.Sleep(1000);
+            if (fps < fpsTarget-1)
+            {
+                fpsStabilized += 10;
+            }
+            else if(fps > fpsTarget + 1 && fpsStabilized>1)
+            {
+                fpsStabilized -= 1;
+            }
+            frameTime= 1000 / fpsStabilized;
+}
     }
 
     static void MovePlayer()
@@ -192,5 +214,7 @@ class Program
             }
         }
     }
+
+
 
 }
