@@ -5,7 +5,7 @@ class Program
 {
     private readonly static int gameWidth = 6, gameHeight = 10;
 
-    private static char[,] gameZone = new char[gameHeight, gameWidth];
+    private  static char[,] gameZone = new char[gameHeight, gameWidth];
     private static char[,] lastFrame = new char[gameHeight, gameWidth];
     private static StringBuilder frame = new StringBuilder();
 
@@ -13,33 +13,56 @@ class Program
 
     public static int score = 0;
     private static int playerPosition = 4, oldPlayerPosition = 4;//starting position of the player in the middle of the game zone
-    private static bool GameOver = false;
+    private volatile static bool  GameOver = false;
     private readonly static char player= '█', token= '☆', empty= ' ';
+    private readonly static double tokenSpawnTime = 1.75; // spawn a token every x seconds
+    private readonly static double tokenMoveTime = 0.75; // move tokens every x seconds
 
-    private static Stopwatch stopwatch;
+    private static Stopwatch? stopwatch;
     private static int frameCounter = 0;
     private static int fps;
     private static Queue<int> fpsHistory = new Queue<int>();//queue to store the fps values for the graph
-    private static int fpsTarget = 60;
-    private static int fpsStabilized=fpsTarget;
-    private static int frameTime = 0;
+    private static string graphElements = "▁▂▃▄▅▆▇█";
 
-
-    //add a game loop that runs at a fixed frame rate and updates the game state and draws the game zone on the console
-    //add a warm up phase so that the fps target does +10 until it reaches the target fps, for exapmle if the target fps is 60, the game would run at 34 fps but every frame it increases by 10 or 1 until the actual fps reaches the target fps, at the end the fpsIncreaser would be like 600 or something like that, and the game would run at 60 fps, which would be like hardtyping 600 in the target fps
     //"▁▂▃▄▅▆▇█" for the fps graph, add to a queue the fps value every second and if it's too big dequeue the oldest value,
+
+
+    static void GetFpsGraph()
+    {
+        if (fpsHistory.Count == 0) return;
+
+        if (fpsHistory.Count > 20)
+        {
+            fpsHistory.Dequeue();
+        }
+
+        int maxFps =fpsHistory.Max(), indexElement;
+        double fpsPerc;
+
+        foreach(int fpsValue in fpsHistory)
+        {
+            fpsPerc = (double)fpsValue / maxFps;
+
+            indexElement = (int)(fpsPerc * 7);
+
+
+            Console.Write(graphElements[indexElement]);
+
+        }
+
+    }
+
     static void Main()
     {
         Console.OutputEncoding = Encoding.UTF8;
         Console.CursorVisible = false;
 
         Thread movePlayerInput= new Thread(MovePlayer);
-        Thread FpsWarmUp = new Thread(FpsStabilizer);
 
-
-        double tokenSpawnTime = 1.75; // spawn a token every x seconds
-        double tokenMoveTime = 0.75; // move tokens every x seconds
-        double lastSpawn=0, lastFall=0, lastFpsCounter=0,lastFpsTime=0;
+        double lastSpawn=0,
+            lastFall=0,
+            lastFpsTime=0;
+        int lastFpsCounter = 0;
 
 
         for (int row = 0; row < gameZone.GetLength(0); row++)
@@ -59,10 +82,8 @@ class Program
         gameZone[9, playerPosition] = player;
         DrawBorders();
 
-        FpsWarmUp.Start();
         while (true)
         {
-            long frameStart = stopwatch.ElapsedMilliseconds;
             if (stopwatch.Elapsed.TotalSeconds-lastSpawn>tokenSpawnTime) // spawn tokens at half the frame rate
             {
                 SpawnTokens();
@@ -77,34 +98,22 @@ class Program
             if (stopwatch.Elapsed.TotalSeconds - lastFpsTime > 1)
             {
                 fps = (int)(frameCounter - lastFpsCounter);
+
                 lastFpsCounter = frameCounter;
                 lastFpsTime = stopwatch.Elapsed.TotalSeconds;
+
+                fpsHistory.Enqueue(fps);
+
+
             }
             Draw();
             frameCounter++;
-
-           Thread.Sleep(frameTime);
         }
-        Console.SetCursorPosition(0, gameHeight * 2 + 3);
+
+        Console.SetCursorPosition(0, gameHeight * 2 + 5);
         Console.WriteLine("game over");
 
 
-    }
-    static void FpsStabilizer()
-    {
-        while (true)
-        {
-            Thread.Sleep(1000);
-            if (fps < fpsTarget-1)
-            {
-                fpsStabilized += 10;
-            }
-            else if(fps > fpsTarget + 1 && fpsStabilized>1)
-            {
-                fpsStabilized -= 1;
-            }
-            frameTime= 1000 / fpsStabilized;
-}
     }
 
     static void MovePlayer()
@@ -182,6 +191,9 @@ class Program
         Console.SetCursorPosition(5, gameHeight * 2 + 2);
         Console.Write(fps);
 
+        Console.SetCursorPosition(0, gameHeight * 2 + 4);
+        GetFpsGraph();
+
     }
 
     static void Update()//game logic
@@ -214,7 +226,5 @@ class Program
             }
         }
     }
-
-
 
 }
