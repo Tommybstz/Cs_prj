@@ -4,53 +4,32 @@ using System.Diagnostics;
 class Program
 {
     private readonly static int gameWidth = 6, gameHeight = 10;
-
     private  static char[,] gameZone = new char[gameHeight, gameWidth];
-    private static char[,] lastFrame = new char[gameHeight, gameWidth];
-    private static StringBuilder frame = new StringBuilder();
 
+    //variables for the partial draw
+    private static char[,] lastFrame = new char[gameHeight, gameWidth];
+    private static int lastDrawnFps = -1;
+    private static int lastDrawnScore = -1;
+
+    private static StringBuilder frame = new StringBuilder();
     private static Random Token = new Random();
 
-    public static int score = 0;
+    //game variables
+    private static int score = 0;
     private static int playerPosition = 4, oldPlayerPosition = 4;//starting position of the player in the middle of the game zone
     private volatile static bool  GameOver = false;
     private readonly static char player= '█', token= '☆', empty= ' ';
-    private readonly static double tokenSpawnTime = 1.75; // spawn a token every x seconds
-    private readonly static double tokenMoveTime = 0.75; // move tokens every x seconds
+    private static double tokenSpawnTime; // spawn a token every x seconds
+    private static double tokenMoveTime; // move tokens every x seconds
+    private static readonly string[] difficulties = new string[] {"easy", "normal", "hard", "nightmare"};
 
+    //variables for fps 
     private static Stopwatch? stopwatch;
     private static int frameCounter = 0;
     private static int fps;
     private static Queue<int> fpsHistory = new Queue<int>();//queue to store the fps values for the graph
     private static string graphElements = "▁▂▃▄▅▆▇█";
 
-    //"▁▂▃▄▅▆▇█" for the fps graph, add to a queue the fps value every second and if it's too big dequeue the oldest value,
-
-
-    static void GetFpsGraph()
-    {
-        if (fpsHistory.Count == 0) return;
-
-        if (fpsHistory.Count > 20)
-        {
-            fpsHistory.Dequeue();
-        }
-
-        int maxFps =fpsHistory.Max(), indexElement;
-        double fpsPerc;
-
-        foreach(int fpsValue in fpsHistory)
-        {
-            fpsPerc = (double)fpsValue / maxFps;
-
-            indexElement = (int)(fpsPerc * 7);
-
-
-            Console.Write(graphElements[indexElement]);
-
-        }
-
-    }
 
     static void Main()
     {
@@ -74,6 +53,8 @@ class Program
             }
         }
 
+        ChangeDifficulty();
+        Console.Clear();
 
         movePlayerInput.Start();
 
@@ -115,11 +96,11 @@ class Program
 
 
     }
-
     static void MovePlayer()
     {
         while (true)
         {
+            Thread.Sleep(5);
             if ( ! Console.KeyAvailable) continue;//check if a key is not pressed
 
                 var key = Console.ReadKey(true).Key;
@@ -140,17 +121,16 @@ class Program
 
         }
     }
-
     static void SpawnTokens()
     {
         int elementSpawnPoint;
         elementSpawnPoint = Token.Next(gameZone.GetLength(1));
         gameZone[0, elementSpawnPoint] = token;//spawn a token at the top of the game zone
     }
-
     static void DrawBorders()
     {
         Console.SetCursorPosition(0, 0);
+        //border creation 
         frame.AppendLine($"Score: ");
         for (int row = 0; row < gameZone.GetLength(0); row++)
         {
@@ -168,12 +148,16 @@ class Program
         Console.Write(frame.ToString());
         frame.Clear();
     }
-
     static void Draw()//draw the game zone on the console, happens every frame
     {
         //Build the frame to be drawn on the console
         Console.SetCursorPosition(7, 0);
-        Console.Write(score);
+        if (score != lastDrawnScore)
+        {
+            Console.Write(score);
+            lastDrawnScore = score;
+        }
+
         for (int row = 0; row < gameZone.GetLength(0); row++)
         {
 
@@ -189,13 +173,40 @@ class Program
         }
 
         Console.SetCursorPosition(5, gameHeight * 2 + 2);
-        Console.Write(fps);
+        if (fps != lastDrawnFps)
+        {
+            Console.Write(fps);
+            lastDrawnFps = fps;
+        }
 
         Console.SetCursorPosition(0, gameHeight * 2 + 4);
         GetFpsGraph();
 
     }
+    static void GetFpsGraph()
+    {
+        if (fpsHistory.Count == 0) return;
 
+        if (fpsHistory.Count > 20)
+        {
+            fpsHistory.Dequeue();
+        }
+
+        int maxFps =fpsHistory.Max(), indexElement;
+        double fpsPerc;
+
+        foreach(int fpsValue in fpsHistory)
+        {
+            fpsPerc = (double)fpsValue / maxFps;
+
+            indexElement = (int)(fpsPerc * 7);
+
+
+            Console.Write(graphElements[indexElement]);
+
+        }
+
+    }
     static void Update()//game logic
     {
         for(int row = gameZone.GetLength(0)-2; row >= 0; row--)
@@ -226,5 +237,82 @@ class Program
             }
         }
     }
+    static void ChangeDifficulty() 
+    {
+        ConsoleKey key;
+        bool selected = false;
+        int i = 1,iLast=1;
 
+        Console.WriteLine("Change the difficulty with the up and down arrows or press enter to select:");
+
+        foreach (string difficulty in difficulties)
+        {
+            Console.WriteLine($"- {difficulty}");
+        }
+
+        Console.SetCursorPosition(0, i);
+        Console.Write(">");
+
+        while (! selected)
+        {
+            key=Console.ReadKey(true).Key;
+
+            switch (key) {
+
+                case ConsoleKey.UpArrow:
+                    if (i > 1)
+                    {
+                        i--;
+                    }
+                    break;
+
+                case ConsoleKey.DownArrow:
+                    if (i < 4)
+                    {
+                        i++;
+                    }
+                    break;
+
+                case ConsoleKey.Enter:
+                    selected = true;
+                    break;
+
+                default:
+                    break;
+            }
+
+            Console.SetCursorPosition(0, iLast);
+            Console.WriteLine("- ");
+            Console.SetCursorPosition(0, i);
+            Console.Write(">");
+            iLast = i;
+
+        }
+
+        switch (difficulties[i-1])
+        {
+            //time in seconds based on the difficulty selected by the player
+            case "easy":
+                tokenMoveTime = 0.75;
+                tokenSpawnTime = 1.75;
+                break;
+
+            case "normal":
+                tokenMoveTime = 0.5;
+                tokenSpawnTime = 1.5;
+                break;
+
+            case "hard":
+                tokenMoveTime = 0.3;
+                tokenSpawnTime = 1.3;
+                break;
+
+            case "nightmare":
+                tokenMoveTime = 0.15;
+                tokenSpawnTime = 1.15;
+                break;
+        }
+
+
+    }
 }
