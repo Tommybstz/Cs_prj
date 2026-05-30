@@ -5,7 +5,7 @@ namespace Falling_Tokens_Game
 {
     class Program
     {
-        private readonly static int gameWidth = 6, gameHeight = 10;
+        private const int gameWidth = 6, gameHeight = 10;
         private static char[,] gameZone = new char[gameHeight, gameWidth];
 
         //variables for the partial draw
@@ -23,7 +23,7 @@ namespace Falling_Tokens_Game
         private readonly static char player = '☗', token = '★', bomb = '✸', empty = ' ';
         private static double tokenSpawnTime; // spawn a token every x seconds
         private static double tokenMoveTime; // move tokens every x seconds
-        private static readonly string[] difficulties = new string[] { "easy", "normal", "hard", "nightmare" };
+        private enum Difficulty { Easy, Normal, Hard, Nightmare };
 
         //variables for fps 
         private static Stopwatch? stopwatch;
@@ -259,15 +259,14 @@ namespace Falling_Tokens_Game
         {
             char selectionIndicator = '➪',
                 selectionEmpty = '•';
-            ConsoleKey key;
             bool selected = false;
             int i = 1, iLast = 1;
 
             Console.WriteLine("Change the difficulty with the up and down arrows or press enter to select:");
 
-            foreach (string difficulty in difficulties)
+            foreach (Difficulty d in Enum.GetValues(typeof(Difficulty)))
             {
-                Console.WriteLine($"{selectionEmpty} {difficulty}");
+                Console.WriteLine($"{selectionEmpty} {d}");
             }
 
             Console.SetCursorPosition(0, i);
@@ -275,7 +274,7 @@ namespace Falling_Tokens_Game
 
             while (!selected)
             {
-                key = Console.ReadKey(true).Key;
+                var key = Console.ReadKey(true).Key;
 
                 switch (key)
                 {
@@ -310,25 +309,27 @@ namespace Falling_Tokens_Game
 
             }
 
-            switch (difficulties[i - 1])
+            Difficulty selectedDifficulty = (Difficulty)(i - 1);
+
+            switch (selectedDifficulty)
             {
                 //time in seconds based on the difficulty selected by the player
-                case "easy":
+                case Difficulty.Easy:
                     tokenMoveTime = 0.75;
                     tokenSpawnTime = 1.75;
                     break;
 
-                case "normal":
+                case Difficulty.Normal:
                     tokenMoveTime = 0.5;
                     tokenSpawnTime = 1.5;
                     break;
 
-                case "hard":
+                case Difficulty.Hard:
                     tokenMoveTime = 0.3;
                     tokenSpawnTime = 1.3;
                     break;
 
-                case "nightmare":
+                case Difficulty.Nightmare:
                     tokenMoveTime = 0.15;
                     tokenSpawnTime = 1.15;
                     break;
