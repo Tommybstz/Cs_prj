@@ -16,14 +16,31 @@ namespace Falling_Tokens_Game
         private static StringBuilder frame = new StringBuilder();
         private static Random rng = new Random();
 
+        //lock
+        private static object lockObject = new object();
+
         //game variables
         private static int score = 0;
         private static int playerPosition = 4, oldPlayerPosition = 4;//starting position of the player in the middle of the game zone
         public volatile static bool GameOver = false;
         private readonly static char player = '☗', token = '★', bomb = '✸', empty = ' ';
-        private static double tokenSpawnTime; // spawn a token every x seconds
-        private static double tokenMoveTime; // move tokens every x seconds
-        private enum Difficulty { Easy, Normal, Hard, Nightmare };
+        private static double tokenSpawnTime = 0.5; // spawn a token every 0.5 seconds at normal timing
+        private static double tokenMoveTime = 1.5; // move tokens every 1.5 seconds
+
+        //options
+        private enum Difficulty
+        {
+            Easy,
+            Normal,
+            Hard,
+            Nightmare
+        }
+        private static List<(string option, Action action)> menuOptions = new List<(string option, Action action)>
+{
+            ("Start",StartGame),
+            ("ChangeDiffuculty",ChangeDifficulty),
+            ("Quit",()=>Environment.Exit(0)),
+        };
 
         //variables for fps 
         private static Stopwatch? stopwatch;
@@ -37,13 +54,18 @@ namespace Falling_Tokens_Game
             Console.OutputEncoding = Encoding.UTF8;
             Console.CursorVisible = false;
 
-            Thread movePlayerInput = new Thread(MovePlayer);
-            Thread Music = new Thread(()=> GameMusic.PlayMusic());
+            MainMenu();
 
-            double lastSpawn = 0,
-                lastFall = 0,
-                lastFpsTime = 0;
-            int lastFpsCounter = 0;
+        }
+        static void StartGame()
+        {
+            GameOver = false;
+            score = 0;
+
+            Thread movePlayerInput = new Thread(MovePlayer) { IsBackground = true };
+            Thread music = new Thread(() => GameMusic.PlayMusic()) { IsBackground = true };
+
+
 
 
             for (int row = 0; row < gameZone.GetLength(0); row++)
@@ -55,16 +77,27 @@ namespace Falling_Tokens_Game
                 }
             }
 
-            ChangeDifficulty();
-            Console.Clear();
-
-            Music.Start();
+            music.Start();
             movePlayerInput.Start();
 
             stopwatch = Stopwatch.StartNew();
 
             gameZone[9, playerPosition] = player;
+
             DrawBorders();
+
+            GameLoop();
+
+            Console.SetCursorPosition(0, gameHeight * 2 + 5);
+            Console.WriteLine("Game Over! Press any key to return to menu...");
+            Console.ReadKey(true);
+        }
+        static void GameLoop()
+        {
+            double lastSpawn = 0,
+                lastFall = 0,
+                lastFpsTime = 0;
+            int lastFpsCounter = 0;
 
             while (true)
             {
@@ -77,6 +110,7 @@ namespace Falling_Tokens_Game
                 {
                     Update();
                     lastFall = stopwatch.Elapsed.TotalSeconds;
+
                     if (GameOver) break;
                 }
                 if (stopwatch.Elapsed.TotalSeconds - lastFpsTime > 1)
@@ -93,11 +127,6 @@ namespace Falling_Tokens_Game
                 Draw();
                 frameCounter++;
             }
-
-            Console.SetCursorPosition(0, gameHeight * 2 + 5);
-            Console.WriteLine("game over");
-
-
         }
         static void MovePlayer()
         {
@@ -118,9 +147,11 @@ namespace Falling_Tokens_Game
                     oldPlayerPosition = playerPosition++;
                 }
                 else continue;
-                gameZone[gameZone.GetLength(0) - 1, oldPlayerPosition] = empty;//clear the old player position
-                gameZone[gameZone.GetLength(0) - 1, playerPosition] = player;
-
+                lock (lockObject)
+                {
+                    gameZone[gameZone.GetLength(0) - 1, oldPlayerPosition] = empty;//clear the old player position
+                    gameZone[gameZone.GetLength(0) - 1, playerPosition] = player;
+                }
 
             }
         }
@@ -169,11 +200,15 @@ namespace Falling_Tokens_Game
 
                 for (int col = 0; col < gameZone.GetLength(1); col++)
                 {
-                    if (gameZone[row, col] != lastFrame[row, col])
+                    lock (lockObject)
                     {
-                        Console.SetCursorPosition(col * 4 + 2, row * 2 + 2);
-                        Console.Write(gameZone[row, col]);
-                        lastFrame[row, col] = gameZone[row, col];
+                        if (gameZone[row, col] != lastFrame[row, col])
+                        {
+
+                            Console.SetCursorPosition(col * 4 + 2, row * 2 + 2);
+                            Console.Write(gameZone[row, col]);
+                            lastFrame[row, col] = gameZone[row, col];
+                        }
                     }
                 }
             }
@@ -219,41 +254,107 @@ namespace Falling_Tokens_Game
             {
                 for (int col = gameZone.GetLength(1) - 1; col >= 0; col--)
                 {
-                    if (gameZone[row, col] != token && gameZone[row, col] != bomb) continue;//check if there is a token or a bomb at the current position, if not continue to the next position
+                    lock (lockObject)
+                    {
+                        if (gameZone[row, col] != token && gameZone[row, col] != bomb) continue;//check if there is a token or a bomb at the current position, if not continue to the next position
 
 
-                    if (row + 1 == gameZone.GetLength(0) - 1 && gameZone[row + 1, col] != player && (gameZone[row, col] == token))//checks if the token reached the bottom without the player catching
-                    {
-                        GameOver = true;
-                    }
-                    else if (gameZone[row, col] == bomb && (row + 1 == gameZone.GetLength(0) - 1 && gameZone[row + 1, col] == player))//checks if the player caught the bomb
-                    {
-                        GameOver = true;
-                    }
+                        if (row + 1 == gameZone.GetLength(0) - 1 && gameZone[row + 1, col] != player && (gameZone[row, col] == token))//checks if the token reached the bottom without the player catching
+                        {
+                            GameOver = true;
+                        }
+                        else if (gameZone[row, col] == bomb && (row + 1 == gameZone.GetLength(0) - 1 && gameZone[row + 1, col] == player))//checks if the player caught the bomb
+                        {
+                            GameOver = true;
+                        }
 
-                    else if (row + 1 == gameZone.GetLength(0) - 1 && gameZone[row + 1, col] == player)
-                    {
-                        score++;
-                        gameZone[row, col] = empty;
-                    }
-                    else if (row + 1 == gameZone.GetLength(0) - 1 && gameZone[row + 1, col] != player && gameZone[row, col] == bomb)
-                    {
-                        gameZone[row, col] = empty;
-                    }
-                    else if (gameZone[row, col] == token)
-                    {
-                        gameZone[row, col] = empty;
-                        gameZone[row + 1, col] = token;
-                    }
-                    else
-                    {
+                        else if (row + 1 == gameZone.GetLength(0) - 1 && gameZone[row + 1, col] == player)
+                        {
+                            score++;
+                            gameZone[row, col] = empty;
+                        }
+                        else if (row + 1 == gameZone.GetLength(0) - 1 && gameZone[row + 1, col] != player && gameZone[row, col] == bomb)
+                        {
+                            gameZone[row, col] = empty;
+                        }
+                        else if (gameZone[row, col] == token)
+                        {
+                            gameZone[row, col] = empty;
+                            gameZone[row + 1, col] = token;
+                        }
+                        else
+                        {
 
-                        gameZone[row, col] = empty;
-                        gameZone[row + 1, col] = bomb;
+                            gameZone[row, col] = empty;
+                            gameZone[row + 1, col] = bomb;
+                        }
                     }
-
                 }
             }
+        }
+        static void MainMenu()
+        {
+            char selectionIndicator = '➪',
+                selectionEmpty = '•';
+
+            while (true)
+            {
+                Console.Clear();
+
+                bool selected = false;
+                int i = 1, iLast = 1;
+
+                Console.WriteLine("MAIN MENU");
+
+                foreach (var item in menuOptions)
+                {
+                    Console.WriteLine($"{selectionEmpty} {item.option}");
+                }
+
+                Console.SetCursorPosition(0, i);
+                Console.Write(selectionIndicator);
+
+                while (!selected)
+                {
+                    var key = Console.ReadKey(true).Key;
+
+                    switch (key)
+                    {
+
+                        case ConsoleKey.UpArrow:
+                            if (i > 1)
+                            {
+                                i--;
+                            }
+                            break;
+
+                        case ConsoleKey.DownArrow:
+                            if (i < menuOptions.Count)
+                            {
+                                i++;
+                            }
+                            break;
+
+                        case ConsoleKey.Enter:
+                            selected = true;
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    Console.SetCursorPosition(0, iLast);
+                    Console.WriteLine(selectionEmpty + " ");
+                    Console.SetCursorPosition(0, i);
+                    Console.Write(selectionIndicator);
+                    iLast = i;
+
+                }
+
+                Console.Clear();
+                menuOptions[i - 1].action();
+            }
+
         }
         static void ChangeDifficulty()
         {
@@ -287,7 +388,7 @@ namespace Falling_Tokens_Game
                         break;
 
                     case ConsoleKey.DownArrow:
-                        if (i < 4)
+                        if (i < Enum.GetValues(typeof(Difficulty)).Length)
                         {
                             i++;
                         }
@@ -334,8 +435,6 @@ namespace Falling_Tokens_Game
                     tokenSpawnTime = 1.15;
                     break;
             }
-
-
         }
     }
 }

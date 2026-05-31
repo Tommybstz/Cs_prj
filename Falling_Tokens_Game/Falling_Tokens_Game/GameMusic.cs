@@ -84,15 +84,15 @@ namespace Falling_Tokens_Game
                 }
             }
         }
-        protected enum Duration
+        protected enum Duration : int
         {
             WHOLE = 1600,
-            HALF = WHOLE/2,
-            QUARTER = HALF/2,
-            EIGHTH = QUARTER/2,
-            SIXTEENTH = EIGHTH/2,
+            HALF = WHOLE / 2,
+            QUARTER = HALF / 2,
+            EIGHTH = QUARTER / 2,
+            SIXTEENTH = EIGHTH / 2,
         }
-        protected enum Tone
+        protected enum Tone : int
         {
             REST = 0,
             SolB = 196,
