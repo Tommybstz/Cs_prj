@@ -24,10 +24,14 @@ namespace Falling_Tokens_Game
         private static int playerPosition = 4, oldPlayerPosition = 4;//starting position of the player in the middle of the game zone
         public volatile static bool GameOver = false;
         private readonly static char player = '☗', token = '★', bomb = '✸', empty = ' ';
-        private static double tokenSpawnTime = 0.5; // spawn a token every 0.5 seconds at normal timing
-        private static double tokenMoveTime = 1.5; // move tokens every 1.5 seconds
+        private static double tokenSpawnTime = 1.5; // spawn a token every 1.5 seconds at normal timing
+        private static double tokenMoveTime = 0.5; // move tokens every 0.5 seconds
 
         //options
+        private static char selectionIndicator = '➪',
+            selectionEmpty = '•';
+        private static bool selected = false;
+        private static int ind = 1, indLast = 1;
         private enum Difficulty
         {
             Easy,
@@ -39,8 +43,15 @@ namespace Falling_Tokens_Game
 {
             ("Start",StartGame),
             ("ChangeDiffuculty",ChangeDifficulty),
+            ("Settings",Settings),
             ("Quit",()=>Environment.Exit(0)),
         };
+        private enum SettingOptions
+        {
+            MuteMusic,
+            ReturnToMenu
+        }
+        private static bool musicMute = false;
 
         //variables for fps 
         private static Stopwatch? stopwatch;
@@ -77,7 +88,7 @@ namespace Falling_Tokens_Game
                 }
             }
 
-            music.Start();
+            if(!musicMute) music.Start();
             movePlayerInput.Start();
 
             stopwatch = Stopwatch.StartNew();
@@ -294,15 +305,13 @@ namespace Falling_Tokens_Game
         }
         static void MainMenu()
         {
-            char selectionIndicator = '➪',
-                selectionEmpty = '•';
-
             while (true)
             {
                 Console.Clear();
 
-                bool selected = false;
-                int i = 1, iLast = 1;
+                selected = false;
+                ind = 1;
+                indLast = 1;
 
                 Console.WriteLine("MAIN MENU");
 
@@ -311,7 +320,7 @@ namespace Falling_Tokens_Game
                     Console.WriteLine($"{selectionEmpty} {item.option}");
                 }
 
-                Console.SetCursorPosition(0, i);
+                Console.SetCursorPosition(0, ind);
                 Console.Write(selectionIndicator);
 
                 while (!selected)
@@ -322,16 +331,16 @@ namespace Falling_Tokens_Game
                     {
 
                         case ConsoleKey.UpArrow:
-                            if (i > 1)
+                            if (ind > 1)
                             {
-                                i--;
+                                ind--;
                             }
                             break;
 
                         case ConsoleKey.DownArrow:
-                            if (i < menuOptions.Count)
+                            if (ind < menuOptions.Count)
                             {
-                                i++;
+                                ind++;
                             }
                             break;
 
@@ -343,25 +352,24 @@ namespace Falling_Tokens_Game
                             break;
                     }
 
-                    Console.SetCursorPosition(0, iLast);
+                    Console.SetCursorPosition(0, indLast);
                     Console.WriteLine(selectionEmpty + " ");
-                    Console.SetCursorPosition(0, i);
+                    Console.SetCursorPosition(0, ind);
                     Console.Write(selectionIndicator);
-                    iLast = i;
+                    indLast = ind;
 
                 }
 
                 Console.Clear();
-                menuOptions[i - 1].action();
+                menuOptions[ind - 1].action();
             }
 
         }
         static void ChangeDifficulty()
         {
-            char selectionIndicator = '➪',
-                selectionEmpty = '•';
-            bool selected = false;
-            int i = 1, iLast = 1;
+            selected = false;
+            ind = 1;
+            indLast= 1;
 
             Console.WriteLine("Change the difficulty with the up and down arrows or press enter to select:");
 
@@ -370,7 +378,7 @@ namespace Falling_Tokens_Game
                 Console.WriteLine($"{selectionEmpty} {d}");
             }
 
-            Console.SetCursorPosition(0, i);
+            Console.SetCursorPosition(0, ind);
             Console.Write(selectionIndicator);
 
             while (!selected)
@@ -381,16 +389,16 @@ namespace Falling_Tokens_Game
                 {
 
                     case ConsoleKey.UpArrow:
-                        if (i > 1)
+                        if (ind > 1)
                         {
-                            i--;
+                            ind--;
                         }
                         break;
 
                     case ConsoleKey.DownArrow:
-                        if (i < Enum.GetValues(typeof(Difficulty)).Length)
+                        if (ind < Enum.GetValues(typeof(Difficulty)).Length)
                         {
-                            i++;
+                            ind++;
                         }
                         break;
 
@@ -402,15 +410,15 @@ namespace Falling_Tokens_Game
                         break;
                 }
 
-                Console.SetCursorPosition(0, iLast);
+                Console.SetCursorPosition(0, indLast);
                 Console.WriteLine(selectionEmpty + " ");
-                Console.SetCursorPosition(0, i);
+                Console.SetCursorPosition(0, ind);
                 Console.Write(selectionIndicator);
-                iLast = i;
+                indLast = ind;
 
             }
 
-            Difficulty selectedDifficulty = (Difficulty)(i - 1);
+            Difficulty selectedDifficulty = (Difficulty)(ind - 1);
 
             switch (selectedDifficulty)
             {
@@ -434,6 +442,76 @@ namespace Falling_Tokens_Game
                     tokenMoveTime = 0.15;
                     tokenSpawnTime = 1.15;
                     break;
+            }
+        }
+        static void Settings()
+        {
+            while (true)
+            {
+                Console.Clear();
+
+                selected = false;
+                ind = 1;
+                indLast = 1;
+
+                Console.WriteLine("Settings");
+
+                foreach (SettingOptions option in Enum.GetValues(typeof(SettingOptions)))
+                {
+                    Console.WriteLine($"{selectionEmpty} {option}");
+                }
+
+                Console.SetCursorPosition(0, ind);
+                Console.Write(selectionIndicator);
+
+                while (!selected)
+                {
+                    var key = Console.ReadKey(true).Key;
+
+                    switch (key)
+                    {
+
+                        case ConsoleKey.UpArrow:
+                            if (ind > 1)
+                            {
+                                ind--;
+                            }
+                            break;
+
+                        case ConsoleKey.DownArrow:
+                            if (ind < Enum.GetValues(typeof(SettingOptions)).Length)
+                            {
+                                ind++;
+                            }
+                            break;
+
+                        case ConsoleKey.Enter:
+                            selected = true;
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    Console.SetCursorPosition(0, indLast);
+                    Console.WriteLine(selectionEmpty + " ");
+                    Console.SetCursorPosition(0, ind);
+                    Console.Write(selectionIndicator);
+                    indLast = ind;
+
+                }
+
+                SettingOptions selectedOption = (SettingOptions)(ind - 1);
+
+                switch (selectedOption)
+                {
+                    //time in seconds based on the difficulty selected by the player
+                    case SettingOptions.MuteMusic:
+                        musicMute = !musicMute;//switch for music mute if true when selected becomes false
+                        break;
+                    case SettingOptions.ReturnToMenu:
+                        return;
+                }
             }
         }
     }
