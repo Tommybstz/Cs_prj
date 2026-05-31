@@ -16,8 +16,8 @@ namespace Falling_Tokens_Game
         private static StringBuilder frame = new StringBuilder();
         private static Random rng = new Random();
 
-        //lock
-        private static object lockObject = new object();
+        //lock 
+        private static object lockObject = new object();// ensures thread-safe access to gameZone, only one thread can access it at a time
 
         //game variables
         private static int score = 0;
@@ -30,8 +30,6 @@ namespace Falling_Tokens_Game
         //options
         private static char selectionIndicator = '➪',
             selectionEmpty = '•';
-        private static bool selected = false;
-        private static int ind = 1, indLast = 1;
         private enum Difficulty
         {
             Easy,
@@ -42,7 +40,7 @@ namespace Falling_Tokens_Game
         private static List<(string option, Action action)> menuOptions = new List<(string option, Action action)>
 {
             ("Start",StartGame),
-            ("ChangeDiffuculty",ChangeDifficulty),
+            ("ChangeDifficulty",ChangeDifficulty),
             ("Settings",Settings),
             ("Quit",()=>Environment.Exit(0)),
         };
@@ -70,15 +68,20 @@ namespace Falling_Tokens_Game
         }
         static void StartGame()
         {
+            //reset all the variables
             GameOver = false;
             score = 0;
+            frameCounter = 0;
+            fps = 0;
+            lastDrawnFps = -1;
+            lastDrawnScore = -1;
+            fpsHistory.Clear();
 
+            //Threads
             Thread movePlayerInput = new Thread(MovePlayer) { IsBackground = true };
             Thread music = new Thread(() => GameMusic.PlayMusic()) { IsBackground = true };
 
-
-
-
+            //initialize the game zone to empty
             for (int row = 0; row < gameZone.GetLength(0); row++)
             {
                 for (int col = 0; col < gameZone.GetLength(1); col++)
@@ -88,16 +91,17 @@ namespace Falling_Tokens_Game
                 }
             }
 
-            if(!musicMute) music.Start();
+            //start threads
+            if (!musicMute) music.Start();//if option activated
             movePlayerInput.Start();
 
-            stopwatch = Stopwatch.StartNew();
+            stopwatch = Stopwatch.StartNew();//stopwatch to calculate fps
 
-            gameZone[9, playerPosition] = player;
+            gameZone[gameHeight - 1, playerPosition] = player;//initialize player in gamezone
 
-            DrawBorders();
+            DrawBorders();//draws the border for the game
 
-            GameLoop();
+            GameLoop();//timings for the spawn, update of the objects and fps check
 
             Console.SetCursorPosition(0, gameHeight * 2 + 5);
             Console.WriteLine("Game Over! Press any key to return to menu...");
@@ -105,6 +109,7 @@ namespace Falling_Tokens_Game
         }
         static void GameLoop()
         {
+            //initialize variables for the timing
             double lastSpawn = 0,
                 lastFall = 0,
                 lastFpsTime = 0;
@@ -112,6 +117,7 @@ namespace Falling_Tokens_Game
 
             while (true)
             {
+                //Thread.Sleep(1);
                 if (stopwatch.Elapsed.TotalSeconds - lastSpawn > tokenSpawnTime) // spawn tokens at half the frame rate
                 {
                     SpawnObjects();
@@ -124,7 +130,7 @@ namespace Falling_Tokens_Game
 
                     if (GameOver) break;
                 }
-                if (stopwatch.Elapsed.TotalSeconds - lastFpsTime > 1)
+                if (stopwatch.Elapsed.TotalSeconds - lastFpsTime > 1)//checks fps every second
                 {
                     fps = (int)(frameCounter - lastFpsCounter);
 
@@ -158,7 +164,8 @@ namespace Falling_Tokens_Game
                     oldPlayerPosition = playerPosition++;
                 }
                 else continue;
-                lock (lockObject)
+
+                lock (lockObject)//updates the player position
                 {
                     gameZone[gameZone.GetLength(0) - 1, oldPlayerPosition] = empty;//clear the old player position
                     gameZone[gameZone.GetLength(0) - 1, playerPosition] = player;
@@ -168,93 +175,101 @@ namespace Falling_Tokens_Game
         }
         static void SpawnObjects()
         {
-            int elementSpawnPoint;
-            elementSpawnPoint = rng.Next(gameZone.GetLength(1));
+            int elementSpawnPoint = rng.Next(gameZone.GetLength(1));//gets a random position
 
-            if (rng.NextDouble() < 0.8)
-                gameZone[0, elementSpawnPoint] = token;//spawn a token at the top of the game zone
-            else gameZone[0, elementSpawnPoint] = bomb;//spawn a bomb
+            lock (lockObject)
+            {
+                //80% chance to spawn a token and 20 to spawn a bomb
+                if (rng.NextDouble() < 0.8) gameZone[0, elementSpawnPoint] = token;//spawn a token at the top of the game zone
+                else gameZone[0, elementSpawnPoint] = bomb;//spawn a bomb
+            }
         }
         static void DrawBorders()
         {
             Console.SetCursorPosition(0, 0);
-            //border creation 
+            //border frame creation 
             frame.AppendLine($"Score: ");
             for (int row = 0; row < gameZone.GetLength(0); row++)
             {
-                frame.AppendLine(new string('─', gameZone.GetLength(1) * 4 + 1));
+                frame.AppendLine(new string('─', gameZone.GetLength(1) * 4 + 1));//line border
 
+                //colums borders
                 for (int col = 0; col < gameZone.GetLength(1); col++)
                 {
                     frame.Append($"| {empty} ");
                 }
-                frame.AppendLine("|");
+                frame.AppendLine("|");//right border
             }
-            frame.AppendLine(new string('─', gameZone.GetLength(1) * 4 + 1));
+            frame.AppendLine(new string('─', gameZone.GetLength(1) * 4 + 1));//bottom border
             frame.AppendLine($"FPS: ");
 
-            Console.Write(frame.ToString());
+            Console.Write(frame.ToString());//draws border
             frame.Clear();
         }
         static void Draw()//draw the game zone on the console, happens every frame
         {
-            //Build the frame to be drawn on the console
-            Console.SetCursorPosition(7, 0);
+            char[,] snapshot;
+            lock (lockObject)
+            {
+                snapshot = (char[,])gameZone.Clone();//takes a snapshot of the gamezone
+            }
+
+            //updates the frame only if something changes
             if (score != lastDrawnScore)
             {
+                Console.SetCursorPosition(7, 0);
                 Console.Write(score);
                 lastDrawnScore = score;
             }
 
-            for (int row = 0; row < gameZone.GetLength(0); row++)
+            for (int row = 0; row < gameHeight; row++)
             {
 
-                for (int col = 0; col < gameZone.GetLength(1); col++)
+                for (int col = 0; col < gameWidth; col++)
                 {
-                    lock (lockObject)
-                    {
-                        if (gameZone[row, col] != lastFrame[row, col])
-                        {
 
-                            Console.SetCursorPosition(col * 4 + 2, row * 2 + 2);
-                            Console.Write(gameZone[row, col]);
-                            lastFrame[row, col] = gameZone[row, col];
-                        }
+                    if (snapshot[row, col] != lastFrame[row, col])
+                    {
+
+                        Console.SetCursorPosition(col * 4 + 2, row * 2 + 2);
+                        Console.Write(snapshot[row, col]);
+                        lastFrame[row, col] = snapshot[row, col];
                     }
                 }
             }
 
-            Console.SetCursorPosition(5, gameHeight * 2 + 2);
             if (fps != lastDrawnFps)
             {
+                Console.SetCursorPosition(5, gameHeight * 2 + 2);
                 Console.Write(fps);
                 lastDrawnFps = fps;
             }
 
             Console.SetCursorPosition(0, gameHeight * 2 + 4);
-            GetFpsGraph();
+            GetFpsGraph();//draws teh graph for the fps
 
         }
         static void GetFpsGraph()
         {
-            if (fpsHistory.Count == 0) return;
+            if (fpsHistory.Count == 0) return;//if the queue is empty it returns 
 
-            if (fpsHistory.Count > 20)
+            if (fpsHistory.Count > 20)//when the queue is longer than 20 it dequques to make space for new values
             {
                 fpsHistory.Dequeue();
             }
 
-            int maxFps = fpsHistory.Max(), indexElement;
+            int maxFps = fpsHistory.Max(),
+                indexElement;
             double fpsPerc;
 
             foreach (int fpsValue in fpsHistory)
             {
-                fpsPerc = (double)fpsValue / maxFps;
+                fpsPerc = (double)fpsValue / maxFps;//calculate the percent of the fps compared to the max
 
-                indexElement = (int)(fpsPerc * 7);
+                indexElement = (int)(fpsPerc * 7);//gets the index for the char to place using percentual
 
 
-                Console.Write(graphElements[indexElement]);
+                Console.Write(graphElements[indexElement]);//prints the char 
 
             }
 
@@ -265,40 +280,43 @@ namespace Falling_Tokens_Game
             {
                 for (int col = gameZone.GetLength(1) - 1; col >= 0; col--)
                 {
+                    bool isToken, isBomb;
+                    //checks if there is a bomb or a token and returns true or false 
                     lock (lockObject)
                     {
-                        if (gameZone[row, col] != token && gameZone[row, col] != bomb) continue;//check if there is a token or a bomb at the current position, if not continue to the next position
+                        isToken = gameZone[row, col] == token;
+                        isBomb = gameZone[row, col] == bomb;
+                    }
 
+                    if (!isToken && !isBomb) continue;//if there is a token or a bomb at the current position, if not continue to the next position
 
-                        if (row + 1 == gameZone.GetLength(0) - 1 && gameZone[row + 1, col] != player && (gameZone[row, col] == token))//checks if the token reached the bottom without the player catching
-                        {
-                            GameOver = true;
-                        }
-                        else if (gameZone[row, col] == bomb && (row + 1 == gameZone.GetLength(0) - 1 && gameZone[row + 1, col] == player))//checks if the player caught the bomb
-                        {
-                            GameOver = true;
-                        }
+                    bool playerHere;
+                    lock (lockObject) { playerHere = gameZone[row + 1, col] == player; }
 
-                        else if (row + 1 == gameZone.GetLength(0) - 1 && gameZone[row + 1, col] == player)
+                    if (row + 1 == gameZone.GetLength(0) - 1)
+                    {
+
+                        if (!playerHere && isToken) GameOver = true;//checks if the token reached the bottom without the player catching
+                        else if (playerHere && isBomb) GameOver = true;//the player caught the bomb KABOOM!
+                        else if (playerHere && isToken)//the player catches the token
                         {
                             score++;
-                            gameZone[row, col] = empty;
+                            lock (lockObject) { gameZone[row, col] = empty; }
                         }
-                        else if (row + 1 == gameZone.GetLength(0) - 1 && gameZone[row + 1, col] != player && gameZone[row, col] == bomb)
+                        else if (!playerHere && isBomb)//the player dodged the bomb 
+                        {
+                            lock (lockObject) { gameZone[row, col] = empty; }
+                        }
+                    }
+                    else
+                    {
+                        //makes the item move down (fall)
+                        lock (lockObject)
                         {
                             gameZone[row, col] = empty;
+                            gameZone[row + 1, col] = isToken ? token : bomb;
                         }
-                        else if (gameZone[row, col] == token)
-                        {
-                            gameZone[row, col] = empty;
-                            gameZone[row + 1, col] = token;
-                        }
-                        else
-                        {
 
-                            gameZone[row, col] = empty;
-                            gameZone[row + 1, col] = bomb;
-                        }
                     }
                 }
             }
@@ -309,9 +327,9 @@ namespace Falling_Tokens_Game
             {
                 Console.Clear();
 
-                selected = false;
-                ind = 1;
-                indLast = 1;
+                bool selected = false;
+                int ind = 1;
+                int indLast = 1;
 
                 Console.WriteLine("MAIN MENU");
 
@@ -323,7 +341,7 @@ namespace Falling_Tokens_Game
                 Console.SetCursorPosition(0, ind);
                 Console.Write(selectionIndicator);
 
-                while (!selected)
+                while (!selected)//if an option has been selected exits the loop
                 {
                     var key = Console.ReadKey(true).Key;
 
@@ -367,9 +385,9 @@ namespace Falling_Tokens_Game
         }
         static void ChangeDifficulty()
         {
-            selected = false;
-            ind = 1;
-            indLast= 1;
+            bool selected = false;
+            int ind = 1;
+            int indLast = 1;
 
             Console.WriteLine("Change the difficulty with the up and down arrows or press enter to select:");
 
@@ -450,9 +468,9 @@ namespace Falling_Tokens_Game
             {
                 Console.Clear();
 
-                selected = false;
-                ind = 1;
-                indLast = 1;
+                bool selected = false;
+                int ind = 1;
+                int indLast = 1;
 
                 Console.WriteLine("Settings");
 
