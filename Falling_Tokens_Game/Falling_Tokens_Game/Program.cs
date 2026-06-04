@@ -76,9 +76,6 @@ namespace Falling_Tokens_Game
             Thread movePlayerInput = new Thread(MovePlayer) { IsBackground = true };
             Thread music = new Thread(() => GameMusic.PlayMusic()) { IsBackground = true };
 
-
-
-
             for (int row = 0; row < gameZone.GetLength(0); row++)
             {
                 for (int col = 0; col < gameZone.GetLength(1); col++)
@@ -105,6 +102,7 @@ namespace Falling_Tokens_Game
         }
         static void GameLoop()
         {
+            Thread.Sleep(1);
             double lastSpawn = 0,
                 lastFall = 0,
                 lastFpsTime = 0;
