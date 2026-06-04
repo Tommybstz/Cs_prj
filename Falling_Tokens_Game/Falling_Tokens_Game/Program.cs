@@ -326,6 +326,7 @@ namespace Falling_Tokens_Game
             while (true)
             {
                 Console.Clear();
+                while(Console.KeyAvailable) Console.ReadKey(true);//clear the input buffer to prevent unwanted inputs when returning to the menu
 
                 bool selected = false;
                 int ind = 1;
@@ -379,6 +380,8 @@ namespace Falling_Tokens_Game
                 }
 
                 Console.Clear();
+                while (Console.KeyAvailable) Console.ReadKey(true);
+
                 menuOptions[ind - 1].action();
             }
 
