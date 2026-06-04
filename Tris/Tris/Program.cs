@@ -1,265 +1,158 @@
-using System.Text;
-using System.Threading;
-using System.Diagnostics;
+using System.Runtime.InteropServices;
+
 class Program
 {
-    private readonly static int gameWidth = 6, gameHeight = 10;
-
-    private static char[,] gameZone = new char[gameHeight, gameWidth];
-    private static char[,] lastFrame = new char[gameHeight, gameWidth];
-    private static StringBuilder frame = new StringBuilder();
-
-    private static Random Token = new Random();
-
-    public static int score = 0;
-    private static int playerPosition = 4, oldPlayerPosition = 4;//starting position of the player in the middle of the game zone
-    private static bool GameOver = false;
-    private readonly static char player= '█', token= '☆', empty= ' ';
-
-    private static Stopwatch? stopwatch;
-    private static int frameCounter = 0;
-    private static int fps;
-    private static Queue<int> fpsHistory = new Queue<int>();//queue to store the fps values for the graph
-    private static char[] graphElements = new char[] {'▁','▂','▃','▄','▅','▆','▇','█'};
-    
-    //"▁▂▃▄▅▆▇█" for the fps graph, add to a queue the fps value every second and if it's too big dequeue the oldest value,
     static void Main()
     {
-        Console.OutputEncoding = Encoding.UTF8;
-        Console.CursorVisible = false;
-
-        Thread movePlayerInput= new Thread(MovePlayer);
-
-
-        double tokenSpawnTime = 1.75; // spawn a token every x seconds
-        double tokenMoveTime = 0.75; // move tokens every x seconds
-        double lastSpawn=0, lastFall=0, lastFpsCounter=0,lastFpsTime=0;
-
-
-        for (int i = 0; i < 20; i++)
-        {
-           fpsHistory.Enqueue(0); 
-        }
-
-        for (int row = 0; row < gameZone.GetLength(0); row++)
-        {
-            for (int col = 0; col < gameZone.GetLength(1); col++)
+            while (true)
             {
-                gameZone[row, col] = empty;
-                lastFrame[row, col] = '\0';
-            }
-        }
-
-
-        movePlayerInput.Start();
-
-        stopwatch=Stopwatch.StartNew();
-
-        gameZone[9, playerPosition] = player;
-        DrawBorders();
-
-        while (true)
-        {
-            long frameStart = stopwatch.ElapsedMilliseconds;
-            if (stopwatch.Elapsed.TotalSeconds-lastSpawn>tokenSpawnTime) // spawn tokens at half the frame rate
-            {
-                SpawnTokens();
-                lastSpawn = stopwatch.Elapsed.TotalSeconds;
-            }
-            if (stopwatch.Elapsed.TotalSeconds-lastFall>tokenMoveTime) // spawn tokens at half the frame rate
-            {
-                Update(); 
-                lastFall = stopwatch.Elapsed.TotalSeconds;
-                if(GameOver) break;
-            }
-            if (stopwatch.Elapsed.TotalSeconds - lastFpsTime > 1)
-            {
-                fps = (int)(frameCounter - lastFpsCounter);
-                lastFpsCounter = frameCounter;
-                lastFpsTime = stopwatch.Elapsed.TotalSeconds;
-
-                if (fpsHistory.Count > 20)
-                {
-                    fpsHistory.Dequeue();
-                }
-
-                fpsHistory.Enqueue(fps);
-
-            }
-            Draw();
-            frameCounter++;
-
-        }
-        Console.SetCursorPosition(0, gameHeight * 2 + 3);
-        Console.WriteLine("game over");
-
-
-    }
-
-    static void MovePlayer()
-    {
-        while (true)
-        {
-            if ( ! Console.KeyAvailable) continue;//check if a key is not pressed
-
-                var key = Console.ReadKey(true).Key;
-                if (key == ConsoleKey.LeftArrow && playerPosition > 0)
-                {
-                    // Move player left
-                    oldPlayerPosition = playerPosition--;
-                }
-                else if (key == ConsoleKey.RightArrow && playerPosition < gameZone.GetLength(1) - 1)
-                {
-                    // Move player right
-                    oldPlayerPosition = playerPosition++;
-                }
-                else continue;
-                gameZone[gameZone.GetLength(0) - 1, oldPlayerPosition] = empty;//clear the old player position
-                gameZone[gameZone.GetLength(0) - 1, playerPosition]=player;
-            
-
-        }
-    }
-
-    static void SpawnTokens()
-    {
-        int elementSpawnPoint;
-        elementSpawnPoint = Token.Next(gameZone.GetLength(1));
-        gameZone[0, elementSpawnPoint] = token;//spawn a token at the top of the game zone
-    }
-
-    static void DrawBorders()
-    {
-        Console.SetCursorPosition(0, 0);
-        frame.AppendLine($"Score: ");
-        for (int row = 0; row < gameZone.GetLength(0); row++)
-        {
-            frame.AppendLine(new string('─', gameZone.GetLength(1) * 4 + 1));
-
-            for (int col = 0; col < gameZone.GetLength(1); col++)
-            {
-                frame.Append($"| {empty} ");
-            }
-            frame.AppendLine("|");
-        }
-        frame.AppendLine(new string('─', gameZone.GetLength(1) * 4 + 1));
-        frame.AppendLine($"FPS: ");
-
-        Console.Write(frame.ToString());
-        frame.Clear();
-    }
-
-    static void Draw()//draw the game zone on the console, happens every frame
-    {
-        //Build the frame to be drawn on the console
-        Console.SetCursorPosition(7, 0);
-        Console.Write(score);
-        for (int row = 0; row < gameZone.GetLength(0); row++)
-        {
-
-            for (int col = 0; col < gameZone.GetLength(1); col++)
-            {
-                if(gameZone[row, col] != lastFrame[row, col])
-                {
-                    Console.SetCursorPosition(col * 4+2, row*2 + 2);
-                    Console.Write(gameZone[row, col]);
-                    lastFrame[row, col] = gameZone[row, col];
-                }
-            }
-        }
-
-        Console.SetCursorPosition(5, gameHeight * 2 + 2);
-        Console.Write(fps);
-        
-
-    }
-
-    static void Update()//game logic
-    {
-        for(int row = gameZone.GetLength(0)-2; row >= 0; row--)
-        {
-            for (int col = gameZone.GetLength(1)-1; col >= 0; col--)
-            {
-                if (gameZone[row, col] != token) continue;//check if there is a token at the current position, if not continue to the next position
                 
+                char position;
+                Console.Write("premere un tasto sul tastierino numerico per selezionare la posizione: ");
+                position=Console.ReadKey().KeyChar;
+                //input x axis
+                Console.Write("Inserire le coordinate (asse x)[1-3]: ");
+                while (!int.TryParse(Console.ReadLine(), out inputX) || inputX > 3 || inputX < 1)
+                switch (position)
+                {
+                    Message(ConsoleColor.Red, "[ERRORE]", "Valore non valido [1-3]");
+                    case '1':
+                        inputX = 2;
+                        inputY = 0;
+                        break;
 
-                    if(row+1 == gameZone.GetLength(0)-1 && gameZone[row+1,col] != player)
-                    {
-                        GameOver = true;
-                    }
+                    case '2':
+                        inputX = 2;
+                        inputY = 1;
+                        break;
 
-                    else if(row + 1 == gameZone.GetLength(0)-1 && gameZone[row + 1, col] == player)
-                    {
-                        score++;
-                        gameZone[row, col] = empty;
-                    }
-                    else
-                    {
+                    case '3':
+                        inputX = 2;
+                        inputY = 2;
+                        break;
 
-                        gameZone[row, col] = empty;
-                        gameZone[row + 1, col] = token;
+                    case '4':
+                        inputX = 1;
+                        inputY = 0;
+                        break;
 
-                    }
-                
+                    case '5':
+                        inputX = 1;
+                        inputY = 1;
+                        break;
+
+                    case '6':
+                        inputX = 1;
+                        inputY = 2;
+                        break;
+
+                    case '7':
+                        inputX = 0;
+                        inputY = 0;
+                        break;
+
+                    case '8':
+                        inputX = 0;
+                        inputY = 1;
+                        break;
+
+                    case '9':
+                        inputX = 0;
+                        inputY = 2;
+                        break;
+
+                    default:
+                        Console.WriteLine("posizione non valida");
+                        continue;
+                }
+
+                //input y axis
+                Console.Write("Inserire le coordinate (asse y[1-3]: ");
+                while (!int.TryParse(Console.ReadLine(), out inputY) || inputY > 3 || inputY < 1)
+                {
+                    Message(ConsoleColor.Red,"[ERRORE]", "Valore non valido [1-3]");
+                }
+
+                // check if the slot is occupied, if it is it skips to the next loop
+                if (trisTable[inputX - 1, inputY - 1] != '\0')
+                if (trisTable[inputX , inputY ] != '\0')
+                {
+                    Message(ConsoleColor.Red, "[ERRORE]", "Casella già occupata!");
+                    continue;
+                break;
             }
-        }
 
-        static void GetGraph()
-        {
-            int maxFps, minFps,fpsPerc,fpsRange;
-            char graphElm = graphElements[0];
+            trisTable[inputX - 1, inputY - 1] = turn;
+            trisTable[inputX, inputY] = turn;
 
-            Console.WriteLine();
-
-            foreach(int fpsValue in fpsHistory)
+            //checks diagonals
+            if (trisTable[0, 0] == trisTable[1, 1] && trisTable[0, 0] == trisTable[2, 2] && trisTable[0, 0] ==turn) //top-left -> bottom-right, and assign the winner X or O. 
+            { 
+                winner = turn;
+                break;
+            }
+            if (trisTable[0, 2] == trisTable[1, 1] && trisTable[0, 2] == trisTable[2, 0] && trisTable[0, 2] == turn)//top-right ->bottom-left.
             {
-                maxFps= fpsHistory.Max();
-                minFps= fpsHistory.Min();
-                fpsRange = maxFps - minFps;
-
-                fpsPerc= fpsValue/fpsRange*100;
-
-                if(fpsPerc < 12.5)
-                {
-                    graphElm = graphElements[0];
-                }
-                else if (fpsPerc < 25)
-                {
-                    graphElm = graphElements[1];
-                }
-                else if (fpsPerc < 37.5)
-                {
-                    graphElm = graphElements[1];
-                }
-                else if (fpsPerc < 50)
-                {
-                    graphElm = graphElements[1];
-                }
-                else if (fpsPerc < 62.5)
-                {
-                    graphElm = graphElements[1];
-                }
-                else if (fpsPerc < 75)
-                {
-                    graphElm = graphElements[1];
-                }
-                else if (fpsPerc < 87.5)
-                {
-                    graphElm = graphElements[1];
-                }
-                else if (fpsPerc < 100)
-                {
-                    graphElm = graphElements[1];
-                }
-
-                Console.Write(graphElm);
-
+                winner = turn;
+                break;
             }
+
+            //checks rows
+            for (x = 0; x < trisTable.GetLength(0); x++)
+            {
+                if (trisTable[x, 0] == trisTable[x, 1] && trisTable[x, 0] == trisTable[x, 2] && trisTable[x, 0] == turn) 
+                {
+                    winner = turn;
+                    won = true;
+                    break;
+                }
+            }
+            if (won) break;
+
+            //checks columns
+            for (y = 0; y < trisTable.GetLength(1); y++)
+            {
+                if (trisTable[0, y] == trisTable[1, y] && trisTable[0, y] == trisTable[2, y] && trisTable[0, y] == turn)
+                {
+                    winner = turn;
+                    won = true;
+                    break;
+                }
+            }
+            if (won) break;
+
         }
 
+        //print table again
+        Console.Clear();
+        Message(ConsoleColor.Cyan, "[RESULT]", "");
+        for (x = 0; x < trisTable.GetLength(0); x++)
+        {
+            Console.WriteLine(new string('─', trisTable.GetLength(1) * 4));
+            for (y = 0; y < trisTable.GetLength(1); y++)
+                Console.Write($"| {trisTable[x, y]} ");
+            Console.WriteLine("|");
+        }
+        Console.WriteLine(new string('─', trisTable.GetLength(1) * 4));
+
+        Thread.Sleep(2500);
+
+        for (int i = 0,time=0; i < 4; i++,time+=400)
+        {
+            Console.Clear();
+            Message(ConsoleColor.Yellow, "[WINNER]", $"Il vincitore è {new string('.',i)}");
+            Thread.Sleep(time);
+        }
+
+        Console.WriteLine();
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine((winner=='T'?$"Pareggio!":$"{winner}!!").PadLeft(20));
+        Console.ResetColor();
 
     }
-
-
-
-}
+    static void Message(ConsoleColor color,string label,string message)
+    {
+        Console.ForegroundColor = color;
+        Console.WriteLine($"{label.PadRight(12)} {message}");
+        Console.ResetColor();
+    }

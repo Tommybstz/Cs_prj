@@ -82,6 +82,20 @@ namespace Falling_Tokens_Game
             Thread music = new Thread(() => GameMusic.PlayMusic()) { IsBackground = true };
 
             //initialize the game zone to empty
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             for (int row = 0; row < gameZone.GetLength(0); row++)
             {
                 for (int col = 0; col < gameZone.GetLength(1); col++)
