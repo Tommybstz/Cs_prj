@@ -1,0 +1,17 @@
+@TodoApi_HostAddress = http://localhost:5000
+
+GET {{TodoApi_HostAddress}}/todos
+Accept: application/json
+
+###
+
+POST {{TodoApi_HostAddress}}/todos
+Content-Type: application/json
+
+{
+  "title": "Buy milk",
+  "description": "From the store",
+  "completed": false
+}
+
+###
