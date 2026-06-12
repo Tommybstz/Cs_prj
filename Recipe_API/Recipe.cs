@@ -45,6 +45,41 @@ namespace Recipe_API
             clonedRecipe.AssignId(this.Id);
             return clonedRecipe;
         }
+        public List<string> ValidateRecipe()//returns an error message if the recipe is invalid, otherwise returns null
+        {
+            var errors = new List<string>();
+
+            if (string.IsNullOrEmpty(this.Name))//early return if recipe name is missing
+            {
+                errors.Add( "Recipe name is required.");
+            }
+            if (this.Ingredients.Count == 0)//early return if no ingredients are provided
+            {
+                errors.Add("At least one ingredient is required.");
+            }
+            if (this.Portions <= 0)//early return if portions is not positive
+            {
+                errors.Add("Portions must be greater than zero.");
+            }
+            if (!Enum.IsDefined(typeof(DifficultyLevel), this.Difficulty))//early return if difficulty is not valid
+            {
+                errors.Add("Invalid difficulty level.");
+            }
+            if (this.DietTypes.Any(d => !Enum.IsDefined(typeof(Diet), d)))//early return if diet type is not valid
+            {
+                errors.Add("Invalid diet type.");
+            }
+
+            foreach (var ingredient in this.Ingredients)//ingredients validation
+            {
+                if (string.IsNullOrEmpty(ingredient.Name))
+                    errors.Add( "Ingredient name is required.");
+                if (ingredient.Quantity <= 0)
+                    errors.Add("Ingredient quantity must be greater than zero.");
+            }
+
+            return errors;//returns all the errors, if any
+        }
 
     }
 

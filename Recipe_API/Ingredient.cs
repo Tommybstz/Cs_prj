@@ -18,6 +18,7 @@ namespace Recipe_API
         Dairy,
         Nuts,
         Shellfish,
+        Fish,
         Soy,
         Eggs
     }

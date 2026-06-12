@@ -2,20 +2,22 @@ using Recipe_API;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+app.UseSwagger();
+app.UseSwaggerUI();
 
 List<Recipe_API.Recipe> recipes = new List<Recipe_API.Recipe>();
 
 //add a new recipe
 app.MapPost("/recipes", (Recipe recipe) =>
 {
-    var error = ValidateRecipe(recipe);
-
-    if (error != null)
+    var errors = recipe.ValidateRecipe();
+    if (errors.Count > 0)
     {
-        return Results.BadRequest(error);
+        return Results.BadRequest(errors);
     }
 
     recipe.AssignId(recipes.Count == 0 ? 1 : recipes.Max(r => r.Id) + 1);//assing unique Id
@@ -24,15 +26,23 @@ app.MapPost("/recipes", (Recipe recipe) =>
 
     return Results.Created($"/recipes/{recipe.Id}", recipe);
 });
-app.MapGet("/recipes/{id}", (int id) =>
+app.MapPut("/recipes/{id}", (int id, Recipe updatedRecipe) =>
 {
-    var recipe = recipes.FirstOrDefault(r => r.Id == id);
 
-    if (recipe == null)
+    var errors = updatedRecipe.ValidateRecipe();
+    if (errors.Count > 0)
+    {
+        return Results.BadRequest(errors);
+    }
+    var recipeIndex = recipes.FindIndex(r => r.Id == id);
+    if (recipeIndex == -1)
     {
         return Results.NotFound();
     }
-    return Results.Ok(recipe);
+    updatedRecipe.AssignId(recipes[recipeIndex].Id);
+
+    recipes[recipeIndex] = updatedRecipe;
+    return Results.NoContent();
 });
 app.MapGet("/recipes/{id}", (int id, int? portionsRequested) =>
 {
@@ -55,7 +65,7 @@ app.MapGet("/recipes/{id}", (int id, int? portionsRequested) =>
 
     return Results.Ok(recipe);
 });
-app.MapGet("/recipes", (Diet? diet, DifficultyLevel? difficulty, Allergen? allergen,string?search) =>
+app.MapGet("/recipes", (Diet? diet, DifficultyLevel? difficulty, Allergen? allergen, string? search) =>
 {
     var filteredRecipes = recipes;//gets all recipes that match the requested diet type
 
@@ -72,7 +82,7 @@ app.MapGet("/recipes", (Diet? diet, DifficultyLevel? difficulty, Allergen? aller
     {
         filteredRecipes = filteredRecipes.Where(r => !r.GetAllergens().Contains(allergen.Value)).ToList();//filters recipes that do not contain the specified allergen
     }
-    if (!string.IsNullOrEmpty(search)) 
+    if (!string.IsNullOrEmpty(search))
     {
         filteredRecipes = filteredRecipes.Where(r => r.Name.StartsWith(search, StringComparison.OrdinalIgnoreCase)).ToList();//filters recipes based on the search term, ignoring case sensitivity
     }
@@ -93,30 +103,30 @@ app.MapDelete("/recipes/{id}", (int id) =>
     recipes.Remove(recipes.FirstOrDefault(r => r.Id == id));
     return Results.NoContent();
 });
-app.Run();
-
-static string? ValidateRecipe(Recipe recipe)
+app.MapDelete("/recipes", (Diet? diet, DifficultyLevel? difficulty, Allergen? allergen, string? recipeName) =>
 {
-    if (string.IsNullOrEmpty(recipe.Name))//early return if recipe name is missing
+    if(diet== null && difficulty == null && allergen == null && string.IsNullOrEmpty(recipeName))
     {
-        return "Recipe name is required.";
-    }
-    if (recipe.Ingredients.Count == 0)//early return if no ingredients are provided
-    {
-        return "At least one ingredient is required.";
-    }
-    if (recipe.Portions <= 0)//early return if portions is not positive
-    {
-        return "Portions must be greater than zero.";
-    }
-    if (!Enum.IsDefined(typeof(DifficultyLevel), recipe.Difficulty))//early return if difficulty is not valid
-    {
-        return "Invalid difficulty level.";
-    }
-    if (recipe.DietTypes.Any(d => !Enum.IsDefined(typeof(Diet), d)))//early return if diet type is not valid
-    {
-        return "Invalid diet type.";
+        return Results.BadRequest("At least one filter parameter must be provided.");
     }
 
-    return null;//validation passed
+    recipes.RemoveAll(r =>
+    (string.IsNullOrEmpty(recipeName) || r.Name.StartsWith(recipeName, StringComparison.OrdinalIgnoreCase)) &&
+    (!diet.HasValue || r.DietTypes.Contains(diet.Value)) &&
+    (!difficulty.HasValue || r.Difficulty == difficulty.Value) &&
+    (!allergen.HasValue || !r.GetAllergens().Contains(allergen.Value))
+    );
+    
+    return Results.NoContent();
+});
+app.MapDelete("/recipes/all", (bool?confirm) =>
+{
+    if(confirm != true)
+{
+    return Results.BadRequest("Confirmation parameter is required to delete all recipes. Set confirm=true to proceed.");
 }
+
+    recipes.Clear();
+    return Results.NoContent();
+});
+app.Run();
