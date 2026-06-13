@@ -10,7 +10,6 @@ namespace Recipe_API
         public string Name { get; set; }
         public string Description { get; set; }
         public List<Ingredient> Ingredients { get; set; }
-        public List<Allergen> Allergens { get; private set; }
         public List<Diet> DietTypes { get; set; }
         public List<string> Instructions { get; set; }
         public int Portions { get; set; }
@@ -19,10 +18,14 @@ namespace Recipe_API
         {
             Id = id;
         }
-        public List<Allergen> GetAllergens()
+        public Allergen GetAllergens()
         {
-            Allergens = Ingredients.SelectMany(i => i.Allergens).Distinct().ToList();
-            return Allergens;
+            Allergen combined = Allergen.None;
+            foreach (var ingredient in Ingredients)
+            {
+                combined |= ingredient.Allergens;// |= is += for bitwise operations, it combines the allergens of all ingredients into one value like 100 + 010 = 110 (Gluten + Dairy) 
+            }
+            return combined;
         }
         public Recipe Clone()
         {
@@ -35,7 +38,7 @@ namespace Recipe_API
                     Name = i.Name,
                     Quantity = i.Quantity,
                     Unit = i.Unit,
-                    Allergens = new List<Allergen>(i.Allergens)
+                    Allergens = i.Allergens
                 }).ToList(),
                 DietTypes = new List<Diet>(this.DietTypes),
                 Instructions = new List<string>(this.Instructions),
@@ -83,7 +86,7 @@ namespace Recipe_API
 
     }
 
-    public enum Diet
+    public enum Diet:int
     {
         Vegetarian,
         Vegan,
@@ -94,7 +97,7 @@ namespace Recipe_API
         Halal,
         Kosher
     }
-    public enum DifficultyLevel
+    public enum DifficultyLevel: int
     {
         Easy,//0
         Medium,//1

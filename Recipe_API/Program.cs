@@ -1,8 +1,10 @@
+using Microsoft.EntityFrameworkCore;
 using Recipe_API;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSingleton<RecipeService>();
+builder.Services.AddDbContext<AppDbContext>();
+builder.Services.AddScoped<RecipeService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
