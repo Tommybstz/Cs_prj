@@ -1,39 +1,41 @@
-using Recipe_API;
+using RecipeAPI;
+using RecipeAPI.Data;
+using RecipeAPI.DTOs;
+using RecipeAPI.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<AppDbContext>();//dependency injection for the database context, it will be created once per request and shared across the request
-builder.Services.AddScoped<RecipeService>();//dependency injection for the recipe service, it will be created once per request and shared across the request
+builder.Services.AddDbContext<AppDbContext>();
+builder.Services.AddScoped<RecipeService>();
 
-builder.Services.AddEndpointsApiExplorer();//adds support for API documentation generation, it allows to discover the API endpoints and their parameters
-builder.Services.AddSwaggerGen();//adds user-friendly documentation for the API, it generates a Swagger UI that allows to test the API endpoints and see their details
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-app.UseSwagger();//middleware to serve teh generated Swagger JSON, it will be available at /swagger/v1/swagger.json endpoint
-app.UseSwaggerUI();//middleware to serve the generated Swagger UI, it will be available at /swagger endpoint
+app.UseSwagger();
+app.UseSwaggerUI();
 
-//add a new recipe
-app.MapPost("/recipes", (Recipe recipe, RecipeService recipeService) =>
+app.MapPost("/recipes", (RecipeRequest req, RecipeService recipeService) =>
 {
-    var errors = recipe.ValidateRecipe();//returns a list of error messages, if any
-    if (errors.Count > 0)//if the recipe is invalid, return a bad request response with the error messages
-    {
-        return Results.BadRequest(errors);
-    }
-
-    recipeService.AddRecipe(recipe);
-
-    return Results.Created($"/recipes/{recipe.Id}", recipe);
-});
-app.MapPut("/recipes/{id}", (int id, Recipe updatedRecipe, RecipeService recipeService) =>
-{
-
-    var errors = updatedRecipe.ValidateRecipe();
+    var errors = req.ValidateRecipe();
     if (errors.Count > 0)
     {
         return Results.BadRequest(errors);
     }
-    bool response = recipeService.UpdateRecipe(id, updatedRecipe);
+
+    var recipe = recipeService.AddRecipe(req);
+
+    return Results.Created($"/recipes/{recipe.Id}", recipe);
+});
+app.MapPut("/recipes/{id}", (int id, RecipeRequest req, RecipeService recipeService) =>
+{
+
+    var errors = req.ValidateRecipe();
+    if (errors.Count > 0)
+    {
+        return Results.BadRequest(errors);
+    }
+    bool response = recipeService.UpdateRecipe(id, req);
 
     if (!response)
     {

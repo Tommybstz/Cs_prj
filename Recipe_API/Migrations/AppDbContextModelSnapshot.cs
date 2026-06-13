@@ -2,11 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Recipe_API;
+using RecipeAPI;
+using RecipeAPI.Data;
 
 #nullable disable
 
-namespace Recipe_API.Migrations
+namespace RecipeAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot
@@ -16,13 +17,13 @@ namespace Recipe_API.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.9");
 
-            modelBuilder.Entity("Recipe_API.Ingredient", b =>
+            modelBuilder.Entity("RecipeAPI.Ingredient", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<byte>("Allergens")
+                    b.Property<int>("Allergens")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
@@ -46,7 +47,7 @@ namespace Recipe_API.Migrations
                     b.ToTable("Ingredient");
                 });
 
-            modelBuilder.Entity("Recipe_API.Recipe", b =>
+            modelBuilder.Entity("RecipeAPI.Recipe", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -79,16 +80,16 @@ namespace Recipe_API.Migrations
                     b.ToTable("Recipes");
                 });
 
-            modelBuilder.Entity("Recipe_API.Ingredient", b =>
+            modelBuilder.Entity("RecipeAPI.Ingredient", b =>
                 {
-                    b.HasOne("Recipe_API.Recipe", null)
+                    b.HasOne("RecipeAPI.Recipe", null)
                         .WithMany("Ingredients")
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Recipe_API.Recipe", b =>
+            modelBuilder.Entity("RecipeAPI.Recipe", b =>
                 {
                     b.Navigation("Ingredients");
                 });

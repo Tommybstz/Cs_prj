@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Recipe_API.Migrations
+namespace RecipeAPI.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -38,7 +38,7 @@ namespace Recipe_API.Migrations
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Quantity = table.Column<double>(type: "REAL", nullable: false),
                     Unit = table.Column<string>(type: "TEXT", nullable: false),
-                    Allergens = table.Column<byte>(type: "INTEGER", nullable: false)
+                    Allergens = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -1,5 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-namespace Recipe_API
+using RecipeAPI.Data;
+using RecipeAPI.DTOs;
+using RecipeAPI.Entities;
+namespace RecipeAPI
 {
     public class RecipeService
     {
@@ -11,9 +14,9 @@ namespace Recipe_API
             _logger = logger;
         }
 
-        public Recipe AddRecipe(Recipe recipe)
+        public Recipe AddRecipe(RecipeRequest req)
         {
-            recipe.AssignId(_db.Recipes.Any() ? _db.Recipes.Max(r => r.Id) + 1 : 1);//assing unique Id
+            var recipe = new Recipe(_db.Recipes.Any() ? _db.Recipes.Max(r => r.Id) + 1 : 1).CopyFromRequest(req);
 
             _logger.LogInformation("Attempting to add recipe: {RecipeName}", recipe.Name);
             _db.Add(recipe);
@@ -34,7 +37,7 @@ namespace Recipe_API
         }
         public Recipe? GetById(int id, int? portionsRequested)
         {
-            var recipe = _db.Recipes.Include(r => r.Ingredients).FirstOrDefault(r => r.Id == id)?.Clone();//gets the wanted recipe and clones it to avoid modifying the original one when adjusting ingredient quantities
+            var recipe = _db.Recipes.Include(r => r.Ingredients).FirstOrDefault(r => r.Id == id)?.Clone();
             if (recipe == null) return null;
 
             if (portionsRequested.HasValue && portionsRequested > 0)
@@ -46,25 +49,23 @@ namespace Recipe_API
         }
         public List<Recipe> GetRecipes(Diet? diet, DifficultyLevel? difficulty, Allergen? allergen, string? search)
         {
-            var filteredRecipes = _db.Recipes.Include(r => r.Ingredients).ToList();//gets all recipes that match the requested diet type
+            var filteredRecipes = _db.Recipes.Include(r => r.Ingredients).ToList();
 
-
-            //filters the recipes based on the provided query parameters, if any
             if (diet.HasValue)
             {
-                filteredRecipes = filteredRecipes.Where(r => r.DietTypes.Contains(diet.Value)).ToList();//filters recipes that match the specified diet type
+                filteredRecipes = filteredRecipes.Where(r => r.DietTypes.Contains(diet.Value)).ToList();
             }
             if (difficulty.HasValue)
             {
-                filteredRecipes = filteredRecipes.Where(r => r.Difficulty == difficulty.Value).ToList();//filters recipes that match the specified difficulty level
+                filteredRecipes = filteredRecipes.Where(r => r.Difficulty == difficulty.Value).ToList();
             }
             if (allergen.HasValue)
             {
-                filteredRecipes = filteredRecipes.Where(r => !r.GetAllergens().HasFlag(allergen.Value)).ToList();//filters recipes that do not contain the specified allergen
+                filteredRecipes = filteredRecipes.Where(r => !r.GetAllergens().HasFlag(allergen.Value)).ToList();
             }
             if (!string.IsNullOrEmpty(search))
             {
-                filteredRecipes = filteredRecipes.Where(r => r.Name.StartsWith(search, StringComparison.OrdinalIgnoreCase)).ToList();//filters recipes based on the search term, ignoring case sensitivity
+                filteredRecipes = filteredRecipes.Where(r => r.Name.StartsWith(search, StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
 
@@ -98,7 +99,7 @@ namespace Recipe_API
             if (diet == null && difficulty == null && allergen == null && string.IsNullOrEmpty(recipeName))
             {
                 _logger.LogWarning("DeleteRecipes called without any criteria. Operation aborted to prevent accidental mass deletion.");
-                return false;//no criteria provided, so no recipes will be deleted
+                return false;
             }
 
             var recipesToDelete = _db.Recipes.Where(r =>
@@ -144,7 +145,7 @@ namespace Recipe_API
             }
             return true;
         }
-        public bool UpdateRecipe(int id, Recipe updatedRecipe)
+        public bool UpdateRecipe(int id, RecipeRequest req)
         {
             var existing = _db.Recipes.FirstOrDefault(r => r.Id == id);
 
@@ -155,13 +156,7 @@ namespace Recipe_API
             }
 
             _logger.LogInformation("Attempting to update recipe ID: {RecipeId}", existing.Id);
-            existing.Name = updatedRecipe.Name;
-            existing.Description = updatedRecipe.Description;
-            existing.Instructions = updatedRecipe.Instructions;
-            existing.Portions = updatedRecipe.Portions;
-            existing.Difficulty = updatedRecipe.Difficulty;
-            existing.DietTypes = updatedRecipe.DietTypes;
-            existing.Ingredients = updatedRecipe.Ingredients;
+            existing.CopyFromRequest(req);
             _logger.LogInformation("Recipe ID: {RecipeId} updated in memory", existing.Id);
             try
             {
