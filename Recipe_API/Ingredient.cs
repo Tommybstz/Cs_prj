@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
-
+﻿
 namespace Recipe_API
 {
     public class Ingredient
@@ -12,18 +8,19 @@ namespace Recipe_API
         public string Name { get; set; }
         public double Quantity { get; set; }
         public string Unit { get; set; }
-        public Allergen Allergens { get; set; }//int to store allergen flags, because i use bitmasks to represent multiple allergens in one integer(gluten and dairy will be represented as 3)
+        public Allergen Allergens { get; set; }//using bitmask to store multiple allergens in one value
     }
-    [Flags]
+    [Flags]//the Flags attribute allows to use bitwise operations on the enum values
     public enum Allergen : byte// based on EU regulation on allergens
     {
-        None =      0b000000000,
-        Gluten =    0b000000001,//rapresented as a bitmask, each allergen is a power of 2, so they can be combined using bitwise OR to represent multiple allergens in one value
-        Dairy =     0b000000010,//in binary: 00000010, in decimal: 2
-        Nuts =      0b000000100,
-        Shellfish = 0b000001000,
-        Fish =      0b000010000,
-        Soy =       0b000100000,
-        Eggs =      0b001000000
+        //each allergen is represented as a power of 2 in binary by using the 0b prefix, so they can be combined using bitwise OR to represent multiple allergens in one value 
+        None =      0b00000000,
+        Gluten =    0b00000001,//rapresented as a bitmask, each allergen is a power of 2, so they can be combined using bitwise OR to represent multiple allergens in one value
+        Dairy =     0b00000010,//in binary: 00000010, in decimal: 2
+        Nuts =      0b00000100,
+        Shellfish = 0b00001000,
+        Fish =      0b00010000,
+        Soy =       0b00100000,
+        Eggs =      0b01000000
     }
 }

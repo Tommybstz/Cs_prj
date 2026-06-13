@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Recipe_API
+﻿namespace Recipe_API
 {
     public class Recipe
     {
@@ -31,6 +27,7 @@ namespace Recipe_API
         {
             var clonedRecipe = new Recipe
             {
+                //copying all properties
                 Name = this.Name,
                 Description = this.Description,
                 Ingredients = this.Ingredients.Select(i => new Ingredient
@@ -45,7 +42,7 @@ namespace Recipe_API
                 Portions = this.Portions,
                 Difficulty = this.Difficulty
             };
-            clonedRecipe.AssignId(this.Id);
+            clonedRecipe.AssignId(this.Id);//copying the Id to the cloned recipe
             return clonedRecipe;
         }
         public List<string> ValidateRecipe()//returns an error message if the recipe is invalid, otherwise returns null
@@ -86,7 +83,7 @@ namespace Recipe_API
 
     }
 
-    public enum Diet:int
+    public enum Diet: byte//using byte to save memory since we have less than 256 diet types
     {
         Vegetarian,
         Vegan,
@@ -97,7 +94,7 @@ namespace Recipe_API
         Halal,
         Kosher
     }
-    public enum DifficultyLevel: int
+    public enum DifficultyLevel:byte
     {
         Easy,//0
         Medium,//1

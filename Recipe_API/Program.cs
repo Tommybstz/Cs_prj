@@ -1,23 +1,22 @@
-using Microsoft.EntityFrameworkCore;
 using Recipe_API;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<AppDbContext>();
-builder.Services.AddScoped<RecipeService>();
+builder.Services.AddDbContext<AppDbContext>();//dependency injection for the database context, it will be created once per request and shared across the request
+builder.Services.AddScoped<RecipeService>();//dependency injection for the recipe service, it will be created once per request and shared across the request
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddEndpointsApiExplorer();//adds support for API documentation generation, it allows to discover the API endpoints and their parameters
+builder.Services.AddSwaggerGen();//adds user-friendly documentation for the API, it generates a Swagger UI that allows to test the API endpoints and see their details
 
 var app = builder.Build();
-app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwagger();//middleware to serve teh generated Swagger JSON, it will be available at /swagger/v1/swagger.json endpoint
+app.UseSwaggerUI();//middleware to serve the generated Swagger UI, it will be available at /swagger endpoint
 
 //add a new recipe
 app.MapPost("/recipes", (Recipe recipe, RecipeService recipeService) =>
 {
-    var errors = recipe.ValidateRecipe();
-    if (errors.Count > 0)
+    var errors = recipe.ValidateRecipe();//returns a list of error messages, if any
+    if (errors.Count > 0)//if the recipe is invalid, return a bad request response with the error messages
     {
         return Results.BadRequest(errors);
     }
