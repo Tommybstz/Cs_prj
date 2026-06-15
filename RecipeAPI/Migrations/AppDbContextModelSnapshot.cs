@@ -74,6 +74,9 @@ namespace RecipeAPI.Migrations
                     b.Property<int>("Portions")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
                     b.ToTable("Recipes");

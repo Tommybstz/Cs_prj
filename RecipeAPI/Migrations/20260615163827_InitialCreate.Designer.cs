@@ -10,7 +10,7 @@ using RecipeAPI.Data;
 namespace RecipeAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260614203720_InitialCreate")]
+    [Migration("20260615163827_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -75,6 +75,9 @@ namespace RecipeAPI.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Portions")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("UserId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
