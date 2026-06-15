@@ -14,10 +14,9 @@ namespace RecipeAPI.Services
             _logger = logger;
         }
 
-        public Recipe AddRecipe(RecipeRequest req)
+        public Recipe AddRecipe(RecipeRequest req,int userId)
         {
-            var recipe = new Recipe(_db.Recipes.Any() ? _db.Recipes.Max(r => r.Id) + 1 : 1).CopyFromRequest(req);
-
+            var recipe = new Recipe(_db.Recipes.Any() ? _db.Recipes.Max(r => r.Id) + 1 : 1,userId).CopyFromRequest(req);
             _logger.LogInformation("Attempting to add recipe: {RecipeName}", recipe.Name);
             _db.Add(recipe);
             _logger.LogInformation("Recipe {RecipeId} added to memory", recipe.Id);
@@ -35,9 +34,9 @@ namespace RecipeAPI.Services
 
             return recipe;
         }
-        public Recipe? GetById(int id, int? portionsRequested)
+        public Recipe? GetById(int id,int userId, int? portionsRequested)
         {
-            var recipe = _db.Recipes.Include(r => r.Ingredients).FirstOrDefault(r => r.Id == id)?.Clone();
+            var recipe = _db.Recipes.Include(r => r.Ingredients).FirstOrDefault(r => r.Id == id && r.UserId==userId)?.Clone();
             if (recipe == null) return null;
 
             if (portionsRequested.HasValue && portionsRequested > 0)
@@ -47,9 +46,9 @@ namespace RecipeAPI.Services
 
             return recipe;
         }
-        public List<Recipe> GetRecipes(Diet? diet, DifficultyLevel? difficulty, Allergen? allergen, string? search)
+        public List<Recipe> GetRecipes(int userId,Diet? diet, DifficultyLevel? difficulty, Allergen? allergen, string? search)
         {
-            var filteredRecipes = _db.Recipes.Include(r => r.Ingredients).ToList();
+            var filteredRecipes = _db.Recipes.Include(r => r.Ingredients).Where(r=>r.UserId==userId).ToList();
 
             if (diet.HasValue)
             {
@@ -71,9 +70,9 @@ namespace RecipeAPI.Services
 
             return filteredRecipes;
         }
-        public bool DeleteRecipe(int id)
+        public bool DeleteRecipe(int id,int userId)
         {
-            var recipe = _db.Recipes.FirstOrDefault(r => r.Id == id);
+            var recipe = _db.Recipes.FirstOrDefault(r => r.Id == id && r.UserId==userId);
             if (recipe == null)
             {
                 _logger.LogWarning("Attempted to delete non-existent recipe with ID: {RecipeId}", id);
@@ -94,7 +93,7 @@ namespace RecipeAPI.Services
             }
             return true;
         }
-        public bool DeleteRecipes(Diet? diet, DifficultyLevel? difficulty, Allergen? allergen, string? recipeName)
+        public bool DeleteRecipes(int userId,Diet? diet, DifficultyLevel? difficulty, Allergen? allergen, string? recipeName)
         {
             if (diet == null && difficulty == null && allergen == null && string.IsNullOrEmpty(recipeName))
             {
@@ -102,7 +101,7 @@ namespace RecipeAPI.Services
                 return false;
             }
 
-            var recipesToDelete = _db.Recipes.Where(r =>
+            var recipesToDelete = _db.Recipes.Where(r => r.UserId==userId&&
             (string.IsNullOrEmpty(recipeName) || r.Name.Equals(recipeName, StringComparison.OrdinalIgnoreCase)) &&
             (!diet.HasValue || r.DietTypes.Contains(diet.Value)) &&
             (!difficulty.HasValue || r.Difficulty == difficulty.Value) &&
@@ -123,7 +122,7 @@ namespace RecipeAPI.Services
             }
             return true;
         }
-        public bool DeleteAllRecipes(bool? confirm)
+        public bool DeleteAllRecipes(int userId,bool? confirm)
         {
             if (confirm != true)
             {
@@ -132,7 +131,7 @@ namespace RecipeAPI.Services
             }
 
             _logger.LogInformation("Attempting to clear the database");
-            _db.Recipes.RemoveRange(_db.Recipes.ToList());
+            _db.Recipes.RemoveRange(_db.Recipes.Where(r=>r.UserId==userId).ToList());
             try
             {
                 _db.SaveChanges();
@@ -145,9 +144,9 @@ namespace RecipeAPI.Services
             }
             return true;
         }
-        public bool UpdateRecipe(int id, RecipeRequest req)
+        public bool UpdateRecipe(int id,int userId, RecipeRequest req)
         {
-            var existing = _db.Recipes.FirstOrDefault(r => r.Id == id);
+            var existing = _db.Recipes.FirstOrDefault(r => r.Id == id && r.UserId==userId);
 
             if (existing == null)
             {
