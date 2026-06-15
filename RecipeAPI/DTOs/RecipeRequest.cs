@@ -20,7 +20,7 @@ namespace RecipeAPI.DTOs
             {
                 errors.Add("Recipe name is required.");
             }
-            if (this.Ingredients.Count == 0)
+            if (this.Ingredients.Count == 0 || this.Ingredients==null)
             {
                 errors.Add("At least one ingredient is required.");
             }

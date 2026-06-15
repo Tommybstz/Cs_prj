@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using RecipeAPI;
 using RecipeAPI.Data;
 
 #nullable disable
@@ -11,7 +10,7 @@ using RecipeAPI.Data;
 namespace RecipeAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260613122337_InitialCreate")]
+    [Migration("20260614203720_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -20,7 +19,7 @@ namespace RecipeAPI.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.9");
 
-            modelBuilder.Entity("RecipeAPI.Ingredient", b =>
+            modelBuilder.Entity("RecipeAPI.Entities.Ingredient", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -50,7 +49,7 @@ namespace RecipeAPI.Migrations
                     b.ToTable("Ingredient");
                 });
 
-            modelBuilder.Entity("RecipeAPI.Recipe", b =>
+            modelBuilder.Entity("RecipeAPI.Entities.Recipe", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -83,16 +82,38 @@ namespace RecipeAPI.Migrations
                     b.ToTable("Recipes");
                 });
 
-            modelBuilder.Entity("RecipeAPI.Ingredient", b =>
+            modelBuilder.Entity("RecipeAPI.Entities.User", b =>
                 {
-                    b.HasOne("RecipeAPI.Recipe", null)
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("RecipeAPI.Entities.Ingredient", b =>
+                {
+                    b.HasOne("RecipeAPI.Entities.Recipe", null)
                         .WithMany("Ingredients")
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RecipeAPI.Recipe", b =>
+            modelBuilder.Entity("RecipeAPI.Entities.Recipe", b =>
                 {
                     b.Navigation("Ingredients");
                 });

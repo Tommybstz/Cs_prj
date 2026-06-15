@@ -2,7 +2,7 @@
 using RecipeAPI.Data;
 using RecipeAPI.DTOs;
 using RecipeAPI.Entities;
-namespace RecipeAPI
+namespace RecipeAPI.Services
 {
     public class RecipeService
     {

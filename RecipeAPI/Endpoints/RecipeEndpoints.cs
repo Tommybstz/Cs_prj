@@ -1,9 +1,11 @@
-﻿using RecipeAPI.DTOs;
+﻿using Microsoft.AspNetCore.Authorization;
+using RecipeAPI.DTOs;
 using RecipeAPI.Entities;
+using RecipeAPI.Services;
 
-namespace RecipeAPI
+namespace RecipeAPI.Endpoints
 {
-    public static class EndPoints
+    public static class RecipeEndpoints
     {
         public static void MapEndPoints(this WebApplication app)
         {
@@ -18,7 +20,7 @@ namespace RecipeAPI
                 var recipe = recipeService.AddRecipe(req);
 
                 return Results.Created($"/recipes/{recipe.Id}", recipe);
-            });
+            }).RequireAuthorization();
             app.MapPut("/recipes/{id}", (int id, RecipeRequest req, RecipeService recipeService) =>
             {
 
@@ -35,7 +37,7 @@ namespace RecipeAPI
                 }
 
                 return Results.NoContent();
-            });
+            }).RequireAuthorization();
             app.MapGet("/recipes/{id}", (int id, int? portionsRequested, RecipeService recipeService) =>
             {
                 if (portionsRequested.HasValue && portionsRequested <= 0)
@@ -47,19 +49,19 @@ namespace RecipeAPI
                     return Results.NotFound();
 
                 return Results.Ok(recipe);
-            });
+            }).RequireAuthorization();
             app.MapGet("/recipes", (Diet? diet, DifficultyLevel? difficulty, Allergen? allergen, string? search, RecipeService recipeService) =>
             {
                 var recipes = recipeService.GetRecipes(diet, difficulty, allergen, search);
 
 
-                if (recipes.Count == 0)
+                /*if (recipes.Count == 0)
                 {
                     return Results.NotFound();
-                }
+                }*/
 
                 return Results.Ok(recipes);
-            });
+            }).RequireAuthorization();
             app.MapDelete("/recipes/{id}", (int id, RecipeService recipeService) =>
             {
                 bool error = recipeService.DeleteRecipe(id);
@@ -78,7 +80,7 @@ namespace RecipeAPI
                     return Results.BadRequest("At least one filter parameter must be provided.");
                 }
                 return Results.NoContent();
-            });
+            }).RequireAuthorization();
             app.MapDelete("/recipes/all", (bool? confirm, RecipeService recipeService) =>
             {
                 bool response = recipeService.DeleteAllRecipes(confirm);
@@ -89,7 +91,7 @@ namespace RecipeAPI
                 }
 
                 return Results.NoContent();
-            });
+            }).RequireAuthorization();
         }
     }
 }
