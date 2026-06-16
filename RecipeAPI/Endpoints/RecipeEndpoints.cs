@@ -10,10 +10,13 @@ namespace RecipeAPI.Endpoints
     {
         public static void MapEndPoints(this WebApplication app)
         {
-            app.MapPost("/recipes", (RecipeRequest req, RecipeService recipeService, HttpContext ctx) =>
+            var recipes=app.MapGroup("/recipes").RequireAuthorization();
+
+            app.MapPost("", (RecipeRequest req, RecipeService recipeService, HttpContext ctx) =>
             {
                 var userIdClaim = ctx.User.FindFirst(ClaimTypes.NameIdentifier);
                 if (userIdClaim == null) return Results.Unauthorized();
+
                 var userId = int.Parse(userIdClaim.Value);
                 
                 var errors = req.ValidateRecipe();
@@ -25,8 +28,8 @@ namespace RecipeAPI.Endpoints
                 var recipe = recipeService.AddRecipe(req,userId);
 
                 return Results.Created($"/recipes/{recipe.Id}", recipe);
-            }).RequireAuthorization();
-            app.MapPut("/recipes/{id}", (int id, RecipeRequest req, RecipeService recipeService,HttpContext ctx) =>
+            });
+            app.MapPut("/{id}", (int id, RecipeRequest req, RecipeService recipeService,HttpContext ctx) =>
             {
                 var userIdClaim = ctx.User.FindFirst(ClaimTypes.NameIdentifier);
                 if (userIdClaim == null) return Results.Unauthorized();
@@ -45,8 +48,8 @@ namespace RecipeAPI.Endpoints
                 }
 
                 return Results.NoContent();
-            }).RequireAuthorization();
-            app.MapGet("/recipes/{id}", (int id, int? portionsRequested, RecipeService recipeService,HttpContext ctx) =>
+            });
+            app.MapGet("/{id}", (int id, int? portionsRequested, RecipeService recipeService,HttpContext ctx) =>
             {
                 var userIdClaim = ctx.User.FindFirst(ClaimTypes.NameIdentifier);
                 if (userIdClaim == null) return Results.Unauthorized();
@@ -55,14 +58,14 @@ namespace RecipeAPI.Endpoints
                 if (portionsRequested.HasValue && portionsRequested <= 0)
                     return Results.BadRequest("Portions requested must be greater than zero.");
 
-                var recipe = recipeService.GetById(id,userId, portionsRequested);
+                var recipe = recipeService.GetRecipeById(id,userId, portionsRequested);
 
                 if (recipe == null)
                     return Results.NotFound();
 
                 return Results.Ok(recipe);
-            }).RequireAuthorization();
-            app.MapGet("/recipes", (Diet? diet, DifficultyLevel? difficulty, Allergen? allergen, string? search, RecipeService recipeService,HttpContext ctx) =>
+            });
+            app.MapGet("", (Diet? diet, DifficultyLevel? difficulty, Allergen? allergen, string? search, RecipeService recipeService,HttpContext ctx) =>
             {
                 var userIdClaim = ctx.User.FindFirst(ClaimTypes.NameIdentifier);
                 if (userIdClaim == null) return Results.Unauthorized();
@@ -77,8 +80,8 @@ namespace RecipeAPI.Endpoints
                 }
 
                 return Results.Ok(recipes);
-            }).RequireAuthorization();
-            app.MapDelete("/recipes/{id}", (int id, RecipeService recipeService,HttpContext ctx) =>
+            });
+            app.MapDelete("/{id}", (int id, RecipeService recipeService,HttpContext ctx) =>
             {
                 var userIdClaim = ctx.User.FindFirst(ClaimTypes.NameIdentifier);
                 if (userIdClaim == null) return Results.Unauthorized();
@@ -92,7 +95,7 @@ namespace RecipeAPI.Endpoints
 
                 return Results.NoContent();
             });
-            app.MapDelete("/recipes", (Diet? diet, DifficultyLevel? difficulty, Allergen? allergen, string? recipeName, RecipeService recipeService,HttpContext ctx) =>
+            app.MapDelete("", (Diet? diet, DifficultyLevel? difficulty, Allergen? allergen, string? recipeName, RecipeService recipeService,HttpContext ctx) =>
             {
                 var userIdClaim = ctx.User.FindFirst(ClaimTypes.NameIdentifier);
                 if (userIdClaim == null) return Results.Unauthorized();
@@ -104,8 +107,8 @@ namespace RecipeAPI.Endpoints
                     return Results.BadRequest("At least one filter parameter must be provided.");
                 }
                 return Results.NoContent();
-            }).RequireAuthorization();
-            app.MapDelete("/recipes/all", (bool? confirm, RecipeService recipeService,HttpContext ctx) =>
+            });
+            app.MapDelete("/all", (bool? confirm, RecipeService recipeService,HttpContext ctx) =>
             {
                 var userIdClaim = ctx.User.FindFirst(ClaimTypes.NameIdentifier);
                 if (userIdClaim == null) return Results.Unauthorized();
@@ -119,7 +122,7 @@ namespace RecipeAPI.Endpoints
                 }
 
                 return Results.NoContent();
-            }).RequireAuthorization();
+            });
         }
     }
 }

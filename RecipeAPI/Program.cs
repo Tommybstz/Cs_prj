@@ -3,6 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using RecipeAPI.Data;
 using RecipeAPI.Endpoints;
+using RecipeAPI.Entities;
 using RecipeAPI.Services;
 using System.Text;
 
@@ -11,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>();
 builder.Services.AddScoped<RecipeService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<AdminService>();
 
 builder.Services.AddAuthentication("Bearer").AddJwtBearer(options =>
 {
@@ -25,7 +27,13 @@ builder.Services.AddAuthentication("Bearer").AddJwtBearer(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
     };
 });
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy =>
+    {
+        policy.RequireRole(Role.Admin.ToString());
+    });
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -55,5 +63,6 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.MapAuthEndpoints();
+app.MapAdminEndpoints();
 app.MapEndPoints();
 app.Run();

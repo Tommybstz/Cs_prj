@@ -28,13 +28,13 @@ namespace RecipeAPI.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to add recipe ID: {RecipeId}", recipe.Id);
+                _logger.LogError(ex, "Failed to add recipe ID: {RecipeId} to database", recipe.Id);
                 throw;
             }
 
             return recipe;
         }
-        public Recipe? GetById(int id,int userId, int? portionsRequested)
+        public Recipe? GetRecipeById(int id,int userId, int? portionsRequested)
         {
             var recipe = _db.Recipes.Include(r => r.Ingredients).FirstOrDefault(r => r.Id == id && r.UserId==userId)?.Clone();
             if (recipe == null) return null;
@@ -88,7 +88,7 @@ namespace RecipeAPI.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to remove recipe ID: {RecipeId}", recipe.Id);
+                _logger.LogError(ex, "Failed to remove recipe ID: {RecipeId} from database", recipe.Id);
                 throw;//rethrowing the exception to be handled by the calling code
             }
             return true;
